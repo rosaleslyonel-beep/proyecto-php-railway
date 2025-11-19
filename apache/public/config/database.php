@@ -11,7 +11,8 @@ $user = getenv('PGUSER') ?: 'admin';
 $password = getenv('PGPASSWORD') ?: 'admin123';
 
 try {
-    $conexion = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db";
+    $conexion = new PDO($dsn, $user, $password);
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Error en la conexión: " . $e->getMessage());
