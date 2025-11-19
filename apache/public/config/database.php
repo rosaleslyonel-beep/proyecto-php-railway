@@ -1,8 +1,8 @@
 <?php
-/*$host = "postgres_db";
+$host = "postgres_db";
 $dbname = "mi_basedatos";
 $user = "admin";
-$password = "admin123";*/
+$password = "admin123";
 
 $host = getenv('PGHOST') ?: 'postgres_db';
 $port = getenv('PGPORT') ?: '5432';
@@ -11,7 +11,7 @@ $user = getenv('PGUSER') ?: 'admin';
 $password = getenv('PGPASSWORD') ?: 'admin123';
 
 try {
-    $dsn = "pgsql:host=$host;port=$port;dbname=$db";
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
     $conexion = new PDO($dsn, $user, $password);
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
