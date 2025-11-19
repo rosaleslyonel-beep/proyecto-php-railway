@@ -195,7 +195,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <?php endif; ?>
 
     <h4>Administración</h4>
-    <?php if (verificarPermiso('6', 'consultar')): ?>
+    <?php if (verificarPermiso('10', 'consultar')): ?>
         <a href="gestion_usuarios.php" title= "Usuarios" class="<?= ($pagina_actual == 'gestion_usuarios.php') ? 'active' : '' ?>">
             <span class="material-icons">people</span> <span class="text">Usuarios</span>
         </a>
