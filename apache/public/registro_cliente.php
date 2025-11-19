@@ -44,7 +44,7 @@ require_once "config/helpers.php";
 
         <label>Contraseña:</label>
         <input type="password" name="contrasena" required>
-        <div class="g-recaptcha" data-sitekey="6Le7gCIrAAAAAJ2hziTsXdBo9lSGWSjjRHEi8wq_"></div>
+        <div class="g-recaptcha" data-sitekey="6Lf3bhEsAAAAAP50-H_vckRRvhLFKGLUFG_sVh8G"></div>
         <button type="submit">Registrarse</button>
     </form>
 </div>
