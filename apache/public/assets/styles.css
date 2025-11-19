@@ -1,0 +1,679 @@
+/* General Styles 
+body, html {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+main {
+    flex: 1;
+}*/
+html, body {
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+}
+
+ 
+#main-content {
+    display: flex;
+    height: calc(100vh - 60px); /* ajusta si tu header tiene otra altura */
+}
+/* Panel izquierdo (lista de protocolos) */
+#panel-lista {
+    width: 250px;
+    background-color: #f0f0f0;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+}
+
+/* Contenido derecho */
+#panel-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Barra de herramientas fija */
+#barra-herramientas {
+    background-color: #263238;
+    color: white;
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+}
+
+
+/* Contenido de las pestañas que hará scroll */
+#contenido-pestanas {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    min-height: 0; /* Necesario para que flexbox no lo expanda fuera de la pantalla */
+}
+ 
+#contenido {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    min-height: 0; /* Necesario para que flexbox no lo expanda fuera de la pantalla */
+}
+
+.content {
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+h2,  h4, h5 {
+    color: #7c8183;
+}
+h3{
+    color: #7c8183;
+}
+p, label, a {
+    color: #333;
+}
+
+/* Header and Navigation */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 5px 10px; /* Reducir el padding vertical */
+    font-size: 14px;    /* Reducir tamaño de fuente si es necesario */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 45px; /* Ajustar la altura total del header */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+ 
+/* Form Styles */
+form {
+    margin: 2em auto;
+    max-width: 90%;
+    background-color: white;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    font-size: 1em;
+    margin-bottom: 0.5em;
+    display: block;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+   
+    padding: 0.7em;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+button:hover {
+    background-color: #263238;
+}
+
+/* Footer */
+footer {
+    background-color: #37474f;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    margin-top: auto;
+}
+footer p {
+    margin: 0;
+    font-size: 0.9em;
+    color: rgb(255, 255, 255);
+}
+
+footer p a {
+    color: #ffcccb;
+    text-decoration: none;
+}
+
+footer p a:hover {
+    text-decoration: underline;
+}
+
+ 
+
+/* Mensaje de error */
+.error-msg {
+    margin: 1em auto;
+    max-width: 400px;
+    background-color: #ffcccb;
+    color: #d32f2f;
+    padding: 1em;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Mensaje de éxito */
+.success-msg {
+    margin: 1em auto;
+    max-width: 400px;
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1em;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Tabla de muestras */
+table {
+    width: 80%;
+    margin: 1em auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.5em;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background-color: #263238;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.gestion-usuarios-container {
+    display: flex;
+    gap: 20px;
+}
+
+.user-list, .user-form {
+    width: 45%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.edit-btn {
+    background-color: #00796b;
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.edit-btn:hover {
+    background-color: #263238;
+}
+
+.gestion-container {
+    display: flex;
+    gap: 20px;
+}
+
+.pantalla-list, .role-pantalla {
+    width: 45%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.gestion-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.role-pantalla, .assigned-roles {
+    width: 45%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.protocolos-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.protocolos-list-container th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.view-btn {
+    background-color: #00796b;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.view-btn:hover {
+    background-color: #263238;
+}
+
+.protocolo-detail-container p {
+    margin: 8px 0;
+}
+
+/* Contenedor para la firma */
+.firma-container {
+    margin-top: 20px;
+    max-width: 100%;
+    text-align: center;
+}
+
+/* Canvas adaptativo */
+#canvas {
+    border: 2px solid #444;
+    width: 100%;
+    max-width: 400px;
+    height: 150px;
+    touch-action: none; /* previene desplazamiento en móviles mientras se firma */
+    background-color: #fff;
+    display: block;
+    margin: auto;
+}
+
+/* Botones para limpiar */
+.firma-buttons {
+    margin-top: 10px;
+}
+
+.firma-buttons button {
+    background-color: #00796b;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.firma-buttons button:hover {
+    background-color: #263238;
+}
+
+.cliente-item {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 4px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.cliente-item:hover {
+    background-color: #e0f2f1;
+}
+
+.cliente-item a {
+    color: #263238;
+    text-decoration: none;
+    display: block;
+}
+
+.cliente-item.activo {
+    background-color: #60838062;
+    border-left: 4px solid #15302d;
+    font-weight: bold;
+}
+
+/* nueva parte*/
+
+/* Layout general */
+#main-content {
+    display: flex;
+    height: calc(100vh - 60px);
+    background-color: #f9f9f9;
+}
+
+/* Panel izquierdo - lista de protocolos */
+
+
+.panel-lista {
+  width: 320px;
+  min-width: 220px;
+  max-width: 400px;
+  transition: all 0.3s;
+  float: left;
+  padding: 10px;
+}
+
+.panel-lista.oculto {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  overflow: hidden;
+  padding: 0px;
+  border: none;
+}
+
+.panel-contenido {
+  margin-left: 320px;
+  transition: all 0.3s;
+}
+
+.panel-lista.oculto + .panel-contenido {
+  margin-left: 0;
+}
+
+/* El botón de mostrar/ocultar */
+.toggle-panel {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 20;
+  background: #00796b;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  width: 34px;
+  height: 34px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+
+
+
+#panel-lista input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#panel-lista ul {
+    list-style: none;
+    padding: 0;
+}
+
+#panel-lista li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+#panel-lista li:hover {
+    background-color: #e0f2f1;
+}
+
+/* Panel derecho */
+
+
+/* Barra herramientas */
+#barra-herramientas {
+    background-color: #263238;
+    color: white;
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#barra-herramientas button,
+#barra-herramientas a {
+    padding: 10px 16px;
+    background-color: #00695c;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#barra-herramientas button:hover,
+#barra-herramientas a:hover {
+    background-color: #00796b;
+}
+ 
+
+/* Formularios */
+input[type="text"],
+input[type="date"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Footer mejorado */
+footer {
+    background-color: #263238;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    margin-top: auto;
+}
+
+/* Responsive: en pantallas pequeñas el panel izquierdo se colapsa */
+@media (max-width: 768px) {
+  
+
+    #panel-lista {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+    }
+}
+
+/*--nuevo menu moviles-*/
+
+/* --- Estilo general del botón hamburguesa --- */
+#menuToggle {
+    display: none;
+    font-size: 26px;
+    color: white;
+    background-color: #004d40;
+    padding: 10px 15px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    border-radius: 5px;
+    cursor: pointer;
+}
+ 
+/*froms*/
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* por defecto, una columna */
+    gap: 12px 28px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* dos columnas desde 768px en adelante */
+    }
+}
+
+
+
+
+
+
+
+.panel-formulario {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Ancho inicial del panel */
+    
+}
+
+.panel-formulario h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.campo {
+    margin-bottom: -10px;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="tel"],
+.campo input[type="checkbox"],
+.campo select,
+.campo canvas,
+.campo textarea {
+    width: calc(100% - 12px); /* Ajuste para el padding */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.campo textarea {
+    min-height: 80px;
+}
+
+.campo-completo {
+    grid-column: 1 / -1; /* Ocupa todo el ancho en el layout de dos columnas */
+}
+
+.campo-boton {
+    text-align: right;
+}
+
+.campo-boton button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.campo-boton button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para pantallas más grandes (dos columnas) */
+@media (min-width: 768px) {
+    .panel-formulario form {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dos columnas de igual ancho */
+        gap: 15px; /* Espacio entre las columnas y filas */
+    }
+
+    .campo-completo {
+        grid-column: 1 / -1; /* Asegura que los campos completos sigan ocupando todo el ancho */
+    }
+
+    .campo-boton {
+        grid-column: 2 / -1; /* Coloca el botón en la segunda columna */
+        text-align: right; /* Alinea el botón a la derecha */
+    }
+}
+
+/* Estilos adicionales para pantallas aún más grandes si lo deseas */
+@media (min-width: 1200px) {
+    .panel-formulario {
+        width: 90%;
+    }
+}
