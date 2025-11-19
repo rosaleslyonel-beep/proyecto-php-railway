@@ -7,4 +7,4 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/html
 
-COPY public/ /var/www/html/
+COPY apache/public/ /var/www/html/
