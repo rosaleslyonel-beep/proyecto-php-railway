@@ -195,7 +195,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <?php endif; ?>
 
     <h4>Administración</h4>
-    <?php if (verificarPermiso('10', 'consultar')): ?>
+    <?php if (verificarPermiso('5', 'consultar')): ?>
         <a href="gestion_usuarios.php" title= "Usuarios" class="<?= ($pagina_actual == 'gestion_usuarios.php') ? 'active' : '' ?>">
             <span class="material-icons">people</span> <span class="text">Usuarios</span>
         </a>
@@ -215,7 +215,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <span class="material-icons">view_module</span> <span class="text">Pantallas</span>
         </a>
     <?php endif; ?>
-    <?php if (verificarPermiso('10', 'consultar')): ?>
+    <?php if (verificarPermiso('5', 'consultar')): ?>
         <a href="gestion_clientes.php" title= "Clientes" class="<?= ($pagina_actual == 'gestion_clientes.php') ? 'active' : '' ?>">
             <span class="material-icons">business</span> <span class="text">Clientes</span>
         </a>
@@ -225,7 +225,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <span class="material-icons">agriculture</span> <span class="text">Fincas</span>
         </a>
     <?php endif; ?>
-    <?php if (verificarPermiso('10', 'consultar')): ?>
+    <?php if (verificarPermiso('5', 'consultar')): ?>
         <a href="gestion_tipos_protocolo.php" title= "Tipos de Protocolo" class="<?= ($pagina_actual == 'gestion_tipos_protocolo.php') ? 'active' : '' ?>">
             <span class="material-icons">category</span> <span class="text">Tipos de Protocolo</span>
         </a>
