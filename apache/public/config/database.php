@@ -4,7 +4,7 @@ $dbname = "mi_basedatos";
 $user = "admin";
 $password = "admin123";
 
-$host = getenv('PGHOST') ?: 'postgres_db';
+$host = getenv('PGHOST') ?: 'postgres.railway.internal';
 $port = getenv('PGPORT') ?: '5432';
 $dbname   = getenv('PGDATABASE') ?: 'mi_basedatos';
 $user = getenv('PGUSER') ?: 'admin';
