@@ -6,9 +6,9 @@ $password = "admin123";
 
 $host = getenv('PGHOST') ?: 'postgres.railway.internal';
 $port = getenv('PGPORT') ?: '5432';
-$dbname   = getenv('PGDATABASE') ?: 'mi_basedatos';
-$user = getenv('PGUSER') ?: 'admin';
-$password = getenv('PGPASSWORD') ?: 'admin123';
+$dbname   = getenv('PGDATABASE') ?: 'railway';
+$user = getenv('PGUSER') ?: 'postgres';
+$password = getenv('PGPASSWORD') ?: 'YJowHNVbfltqdOJgTUoAsyaMdsJMViZJ';
 
 try {
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
