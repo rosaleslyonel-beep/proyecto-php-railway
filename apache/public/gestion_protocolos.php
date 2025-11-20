@@ -209,9 +209,9 @@ include "views/menu.php";
                             <?php if ($protocolo): ?>
                             <label>Correlativo:</label>
                             <input type="text" name="Correlativo" value="<?= $protocolo['correlativo'] ?>" readonly>
-  <button type="button" id="btnGenerarCorrelativo" class="btn btn-outline-primary">
-                Generar correlativo
-            </button>
+                                <button type="button" id="btnGenerarCorrelativo" class="btn btn-outline-primary">
+                                    Generar correlativo
+                                </button>
 
             <input type="text" name="correlativo" id="correlativo" class="form-control" readonly>
 
@@ -355,13 +355,7 @@ btn.addEventListener('click', () => {
     btn.innerHTML = panelOculto ? '&#8594;' : '&#8592;'; // Flecha derecha/izquierda
     // Si deseas guardar el estado, usa localStorage aquí
 });
-   //botn generar correlativo 
-   document.getElementById('btnGenerarCorrelativo').addEventListener('click', async () => {
-  const idProtocolo = document.getElementById('id_protocolo').value;
-  if (!idProtocolo) {
-    alert('Primero guarde el protocolo para generar el correlativo.');
-    return;
-  }
+
 
   const formData = new FormData();
   formData.append('id_protocolo', idProtocolo);
@@ -644,6 +638,14 @@ document.addEventListener('DOMContentLoaded', function() {
         mostrarTab(tab);
     }
 });
+
+   //botn generar correlativo 
+   document.getElementById('btnGenerarCorrelativo').addEventListener('click', async () => {
+  const idProtocolo = document.getElementById('id_protocolo').value;
+  if (!idProtocolo) {
+    alert('Primero guarde el protocolo para generar el correlativo.');
+    return;
+  }
 
 </script>
 
