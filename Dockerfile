@@ -8,3 +8,5 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /var/www/html
 
 COPY apache/public/ /var/www/html/
+# Aumentar el límite de variables de entrada
+RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini
