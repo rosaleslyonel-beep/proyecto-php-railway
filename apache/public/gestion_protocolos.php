@@ -147,7 +147,7 @@ include "views/menu.php";
 <div class="panel-separador" id="panel-separador">
     <button id="togglePanelBtn" title="Ocultar/Motrar lista">&#8592;</button>
   </div>
-    <!-- PANEL DERECHO -->
+    <!-- PANEL DERECHO ----->  
     <div id="panel-detalle" class="panel-detalle">
 
         <!-- Barra herramientas -->
