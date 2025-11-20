@@ -175,6 +175,12 @@ include "views/menu.php";
                     🧾 Ver Boleta de Cobro
                 </a>
             <?php endif; ?>
+            <button type="button" id="btnGenerarCorrelativo" class="btn btn-outline-primary">
+                Generar correlativo
+            </button>
+
+            <input type="text" name="correlativo" id="correlativo" class="form-control" readonly>
+
 
         </div>
 
@@ -205,7 +211,8 @@ include "views/menu.php";
                         </div>
                         <div class="campo">
                             <?php if ($protocolo): ?>
-                            
+                            <label>Correlativo:</label>
+                            <input type="text" name="Correlativo" value="<?= $protocolo['correlativo'] ?>" readonly>
                             <?php endif; ?>
                         </div>
                         <div class="campo">
@@ -346,7 +353,32 @@ btn.addEventListener('click', () => {
     btn.innerHTML = panelOculto ? '&#8594;' : '&#8592;'; // Flecha derecha/izquierda
     // Si deseas guardar el estado, usa localStorage aquí
 });
-   
+   //botn generar correlativo 
+   document.getElementById('btnGenerarCorrelativo').addEventListener('click', async () => {
+  const idProtocolo = document.getElementById('id_protocolo').value;
+  if (!idProtocolo) {
+    alert('Primero guarde el protocolo para generar el correlativo.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('id_protocolo', idProtocolo);
+
+  const res = await fetch('/controllers/protocolo_generar_correlativo.php', {
+    method: 'POST',
+    body: formData
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    alert('Error al generar correlativo: ' + txt);
+    return;
+  }
+
+  const data = await res.json();
+  document.getElementById('correlativo').value = data.correlativo;
+});
+
     
 
 function mostrarTab(tabId) {
