@@ -207,14 +207,7 @@ include "views/menu.php";
                         </div>
                         <div class="campo">
                             <?php if ($protocolo): ?>
-                            <label>Correlativo:</label>
-                            <input type="text" name="Correlativo" value="<?= $protocolo['correlativo'] ?>" readonly>
-                                <button type="button" id="btnGenerarCorrelativo" class="btn btn-outline-primary">
-                                    Generar correlativo
-                                </button>
-
-            <input type="text" name="correlativo" id="correlativo" class="form-control" readonly>
-
+                           
                             <?php endif; ?>
                         </div>
                         <div class="campo">
