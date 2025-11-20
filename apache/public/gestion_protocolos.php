@@ -175,8 +175,6 @@ include "views/menu.php";
                     🧾 Ver Boleta de Cobro
                 </a>
             <?php endif; ?>
-          
-
 
         </div>
 
@@ -207,7 +205,7 @@ include "views/menu.php";
                         </div>
                         <div class="campo">
                             <?php if ($protocolo): ?>
-                           
+                            
                             <?php endif; ?>
                         </div>
                         <div class="campo">
@@ -348,26 +346,7 @@ btn.addEventListener('click', () => {
     btn.innerHTML = panelOculto ? '&#8594;' : '&#8592;'; // Flecha derecha/izquierda
     // Si deseas guardar el estado, usa localStorage aquí
 });
-
-
-  const formData = new FormData();
-  formData.append('id_protocolo', idProtocolo);
-
-  const res = await fetch('/controllers/protocolo_generar_correlativo.php', {
-    method: 'POST',
-    body: formData
-  });
-
-  if (!res.ok) {
-    const txt = await res.text();
-    alert('Error al generar correlativo: ' + txt);
-    return;
-  }
-
-  const data = await res.json();
-  document.getElementById('correlativo').value = data.correlativo;
-});
-
+   
     
 
 function mostrarTab(tabId) {
@@ -632,7 +611,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-  
 </script>
 
 <?php include "modal_buscar_cliente.php"; ?>
