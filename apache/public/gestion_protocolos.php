@@ -639,14 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-   //botn generar correlativo 
-   document.getElementById('btnGenerarCorrelativo').addEventListener('click', async () => {
-  const idProtocolo = document.getElementById('id_protocolo').value;
-  if (!idProtocolo) {
-    alert('Primero guarde el protocolo para generar el correlativo.');
-    return;
-  }
-
+  
 </script>
 
 <?php include "modal_buscar_cliente.php"; ?>
