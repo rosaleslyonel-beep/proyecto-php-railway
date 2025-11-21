@@ -215,7 +215,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <span class="material-icons">view_module</span> <span class="text">Pantallas</span>
         </a>
     <?php endif; ?>
-    <?php if (verificarPermiso('5', 'consultar')): ?>
+    <?php if (verificarPermiso('10', 'consultar')): ?>
         <a href="gestion_clientes.php" title= "Clientes" class="<?= ($pagina_actual == 'gestion_clientes.php') ? 'active' : '' ?>">
             <span class="material-icons">business</span> <span class="text">Clientes</span>
         </a>
