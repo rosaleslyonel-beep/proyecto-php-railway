@@ -1,13 +1,13 @@
 <?php
 require_once "../config/database.php";
 session_start();
-
+/*
 // Asegurar que solo un administrador puede acceder
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol_nombre'] !== 'admin') {
     header("Location: ../index.php");
     exit();
 }
-
+*/
 $nombre = $_POST['nombre'];
 $nit = $_POST['nit'] ?? null;
 $telefono = $_POST['telefono'] ?? null;
