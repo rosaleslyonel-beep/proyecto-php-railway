@@ -50,7 +50,7 @@ try {
     }
     $redirect = ($_SESSION['usuario']['rol_nombre'] === 'admin')
     ? "../gestion_fincas.php?id_cliente={$id_cliente}"
-    : "../gestion_fincas.php";
+    : "../gestion_fincas.php?id_cliente={$id_cliente}";
     //header("Location: ../gestion_fincas.php");
  
     header("Location: $redirect");
