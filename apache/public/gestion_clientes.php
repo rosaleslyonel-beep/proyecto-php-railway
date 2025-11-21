@@ -5,7 +5,7 @@ session_start();
 
 
 
-if (!verificarPermiso(5, 'consultar')) {
+if (!verificarPermiso(10, 'consultar')) {
     header("Location: dashboard.php"); // o muestra mensaje
     exit();
 }
