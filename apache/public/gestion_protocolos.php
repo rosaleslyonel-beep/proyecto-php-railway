@@ -494,6 +494,9 @@ function cargarProtocolos(reset = false) {
         });
 }
 
+
+
+
 document.getElementById('buscador').addEventListener('input', () => {
     terminoBusqueda = document.getElementById('buscador').value;
     pagina = 1;
