@@ -465,7 +465,7 @@ function mostrarTabss(id) {
     document.querySelector(`.tablink[href="#"][onclick*='${id}']`).classList.add('activo');
 }
 
-// Scroll infinito de protocolos
+// Scroll infinito de protocolos 
 let pagina = 1;
 let terminoBusqueda = '';
 let cargando = false;
