@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   apache:
-    build: ./apache
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: php:8.2-apache
     container_name: apache_server
     volumes:
