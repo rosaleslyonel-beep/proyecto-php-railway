@@ -942,7 +942,7 @@ document.getElementById('btnGenerarCorrelativo')?.addEventListener('click', asyn
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
-            throw new Error(data.mensaje || 'Error al generar correlativo');
+            throw new Error(data.mensaje || 'Error al generar correlativo.');
         }
 
         document.getElementById('correlativo').value = data.correlativo;
