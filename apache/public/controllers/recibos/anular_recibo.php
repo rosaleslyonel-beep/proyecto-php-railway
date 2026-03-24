@@ -18,8 +18,8 @@ $numero_recibo = trim($_POST['numero_recibo'] ?? '');
 $fecha_recibo  = trim($_POST['fecha_recibo'] ?? '');
 $monto         = trim($_POST['monto'] ?? '');
 $observaciones = trim($_POST['observaciones'] ?? '');
-http_response_code(400);
- echo json_encode(['ok' => false, 'mensaje' => $id_protocolo ]);
+
+ echo $id_protocolo;
   exit;
 if ($id_protocolo <= 0) {
     http_response_code(400);
