@@ -100,44 +100,47 @@ try {
         ]);
     } else {
         $stmt = $conexion->prepare("
-            INSERT INTO muestras (
-                id_protocolo, tipo_muestra, lote, cantidad, edad, variedad,
-                tipo_vacuna, marca_vacuna, dosis, fecha_elaboracion, fecha_vencimiento,
-                wssv, tsv, ihhnv, imnv, yhv, mrnv, pvnv, ahpnd_ems, ehp, nhpb, div1,
-                created_by, created_date
-            ) VALUES (
-                :id_protocolo, :tipo_muestra, :lote, :cantidad, :edad, :variedad,
-                :tipo_vacuna, :marca_vacuna, :dosis, :fecha_elaboracion, :fecha_vencimiento,
-                :wssv, :tsv, :ihhnv, :imnv, :yhv, :mrnv, :pvnv, :ahpnd_ems, :ehp, :nhpb, :div1,
-                :created_by, :created_date
-            )
-        ");
-        $stmt->execute([
-            ':id_protocolo' => $id_protocolo,
-            ':tipo_muestra' => $tipo_muestra,
-            ':lote' => $lote,
-            ':cantidad' => $cantidad,
-            ':edad' => $edad,
-            ':variedad' => $variedad ?: null,
-            ':tipo_vacuna' => $tipo_vacuna ?: null,
-            ':marca_vacuna' => $marca_vacuna ?: null,
-            ':dosis' => $dosis ?: null,
-            ':fecha_elaboracion' => $fecha_elaboracion ?: null,
-            ':fecha_vencimiento' => $fecha_vencimiento ?: null,
-            ':wssv' => $wssv,
-            ':tsv' => $tsv,
-            ':ihhnv' => $ihhnv,
-            ':imnv' => $imnv,
-            ':yhv' => $yhv,
-            ':mrnv' => $mrnv,
-            ':pvnv' => $pvnv,
-            ':ahpnd_ems' => $ahpnd_ems,
-            ':ehp' => $ehp,
-            ':nhpb' => $nhpb,
-            ':div1' => $div1,
-            ':created_by' => $id_usuario,
-            ':created_date' => $fecha_hoy
-        ]);
+                INSERT INTO muestras (
+                    id_protocolo, tipo_muestra, lote, cantidad, edad, variedad,
+                    tipo_vacuna, marca_vacuna, dosis, fecha_elaboracion, fecha_vencimiento,
+                    wssv, tsv, ihhnv, imnv, yhv, mrnv, pvnv, ahpnd_ems, ehp, nhpb, div1,
+                    created_by, created_date
+                ) VALUES (
+                    :id_protocolo, :tipo_muestra, :lote, :cantidad, :edad, :variedad,
+                    :tipo_vacuna, :marca_vacuna, :dosis, :fecha_elaboracion, :fecha_vencimiento,
+                    :wssv, :tsv, :ihhnv, :imnv, :yhv, :mrnv, :pvnv, :ahpnd_ems, :ehp, :nhpb, :div1,
+                    :created_by, :created_date
+                )
+            ");
+
+            $stmt->bindValue(':id_protocolo', $id_protocolo, PDO::PARAM_INT);
+            $stmt->bindValue(':tipo_muestra', $tipo_muestra, PDO::PARAM_STR);
+            $stmt->bindValue(':lote', $lote, PDO::PARAM_STR);
+            $stmt->bindValue(':cantidad', $cantidad);
+            $stmt->bindValue(':edad', $edad);
+            $stmt->bindValue(':variedad', $variedad !== '' ? $variedad : null, $variedad !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':tipo_vacuna', $tipo_vacuna !== '' ? $tipo_vacuna : null, $tipo_vacuna !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':marca_vacuna', $marca_vacuna !== '' ? $marca_vacuna : null, $marca_vacuna !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':dosis', $dosis !== '' ? $dosis : null, $dosis !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':fecha_elaboracion', $fecha_elaboracion ?: null, $fecha_elaboracion ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':fecha_vencimiento', $fecha_vencimiento ?: null, $fecha_vencimiento ? PDO::PARAM_STR : PDO::PARAM_NULL);
+
+            $stmt->bindValue(':wssv', $wssv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':tsv', $tsv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':ihhnv', $ihhnv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':imnv', $imnv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':yhv', $yhv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':mrnv', $mrnv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':pvnv', $pvnv, PDO::PARAM_BOOL);
+            $stmt->bindValue(':ahpnd_ems', $ahpnd_ems, PDO::PARAM_BOOL);
+            $stmt->bindValue(':ehp', $ehp, PDO::PARAM_BOOL);
+            $stmt->bindValue(':nhpb', $nhpb, PDO::PARAM_BOOL);
+            $stmt->bindValue(':div1', $div1, PDO::PARAM_BOOL);
+
+            $stmt->bindValue(':created_by', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindValue(':created_date', $fecha_hoy, PDO::PARAM_STR);
+
+            $stmt->execute();
 
         $id_muestra = $conexion->lastInsertId();
     }
