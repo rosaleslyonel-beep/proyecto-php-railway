@@ -42,7 +42,8 @@ if ($rol === 'cliente') {
             WHERE (CAST(id_tipo_protocolo AS TEXT) ILIKE :busqueda 
                OR CAST(fecha AS TEXT) ILIKE :busqueda
                or CAST(id_protocolo AS TEXT) ILIKE :busqueda 
-               or CAST(p.id_cliente AS TEXT) ILIKE :busqueda)";
+               or CAST(p.id_cliente AS TEXT) ILIKE :busqueda)
+               or CAST(cl.nombre AS TEXT) ILIKE :busqueda";
             
 if ($rol === 'cliente') {
     $sql .= " and id_cliente = :id_cliente ";
