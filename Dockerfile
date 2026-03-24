@@ -1,25 +1,13 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
- && docker-php-ext-install pdo pdo_pgsql \
- && a2dismod mpm_event || true \
- && a2dismod mpm_worker || true \
- && a2dismod mpm_prefork || true \
- && rm -f /etc/apache2/mods-enabled/mpm_event.load \
-          /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load \
-          /etc/apache2/mods-enabled/mpm_worker.conf \
-          /etc/apache2/mods-enabled/mpm_prefork.load \
-          /etc/apache2/mods-enabled/mpm_prefork.conf \
- && a2enmod mpm_prefork \
- && a2enmod rewrite
+ && docker-php-ext-install pdo pdo_pgsql
 
-WORKDIR /var/www/html
+WORKDIR /app
 
-COPY apache/public/ /var/www/html/
+COPY apache/public/ /app/
 
-RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini \
- && chown -R www-data:www-data /var/www/html
+RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini
 
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app"]
