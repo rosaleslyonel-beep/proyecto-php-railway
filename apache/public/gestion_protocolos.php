@@ -134,6 +134,44 @@ include "views/menu.php";
         color: #004d40;
     }
 
+
+
+
+
+</style>
+
+<style>
+.modal-recibos {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-recibos-contenido {
+  background: #fff;
+  width: 90%;
+  max-width: 1000px;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.2);
+}
+.modal-recibos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.modal-recibos-header h3 {
+  margin: 0;
+}
+.modal-recibos-body input,
+.modal-recibos-body textarea {
+  padding: 6px;
+  box-sizing: border-box;
+}
 </style>
 
 <div id="main-content" class="main-content">
@@ -204,26 +242,32 @@ include "views/menu.php";
                             <input type="text" name="id_protocolo" value="<?= $protocolo['id_protocolo'] ?>" readonly>
                             <?php endif; ?>
                         </div>
+                        <!-- reciboss -->
+                         <?php
+                            $rolSesion = strtolower(trim($_SESSION['rol'] ?? ''));
+                            $puedeGestionarRecibos = in_array($rolSesion, ['admin', 'recepcion'], true);
+                        ?>
                         <div class="campo">
-    <label>Recibos:</label>
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <input type="text" id="resumen_recibos" value="Sin recibos registrados" readonly style="background:#f5f5f5; min-width:240px;">
-        <button type="button" id="btnAdministrarRecibos">Administrar recibos</button>
-    </div>
-</div>
+                            <label>Correlativo:</label>
+                            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                <input type="text"
+                                    id="correlativo"
+                                    name="correlativo"
+                                    value="<?= htmlspecialchars($protocolo['correlativo'] ?? '') ?>"
+                                    readonly
+                                    style="background:#f5f5f5; min-width:220px;">
 
-<div class="campo">
-    <label>Correlativo:</label>
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <input type="text" id="correlativo" name="correlativo"
-               value="<?= htmlspecialchars($protocolo['correlativo'] ?? '') ?>"
-               readonly style="background:#f5f5f5; min-width:220px;">
+                                <?php if ($puedeGestionarRecibos): ?>
+                                    <button type="button" id="btnVerRecibos">💵 Recibos</button>
+                                    <button type="button" id="btnGenerarCorrelativo">⚙️ Generar correlativo</button>
+                                <?php endif; ?>
+                            </div>
 
-        <?php if (in_array(strtolower($_SESSION['rol'] ?? ''), ['admin','recepcion'], true)): ?>
-            <button type="button" id="btnGenerarCorrelativo">Generar correlativo</button>
-        <?php endif; ?>
-    </div>
-</div>
+                            <small id="resumen_recibos" style="display:block; margin-top:6px; color:#666;">
+                                Sin recibos registrados
+                            </small>
+                        </div>
+                          <!-- reciboss fin-->
                         <div class="campo">
                                     <!-- Cliente -->
                             <?php if ($rol !== 'cliente'): ?>
@@ -348,6 +392,64 @@ include "views/menu.php";
      
 </div>
 
+
+<div id="modalRecibos" class="modal-recibos" style="display:none;">
+  <div class="modal-recibos-contenido">
+    <div class="modal-recibos-header">
+      <h3>Recibos del protocolo</h3>
+      <button type="button" id="btnCerrarModalRecibos">✖</button>
+    </div>
+
+    <div class="modal-recibos-body">
+      <div class="form-recibo" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <input type="hidden" id="id_recibo">
+
+        <div>
+          <label>No. Recibo</label>
+          <input type="text" id="numero_recibo" style="width:100%;">
+        </div>
+
+        <div>
+          <label>Fecha</label>
+          <input type="date" id="fecha_recibo" style="width:100%;">
+        </div>
+
+        <div>
+          <label>Monto</label>
+          <input type="number" step="0.01" id="monto_recibo" style="width:100%;">
+        </div>
+
+        <div style="grid-column: 1 / 4;">
+          <label>Observaciones</label>
+          <textarea id="observaciones_recibo" rows="2" style="width:100%;"></textarea>
+        </div>
+
+        <div style="grid-column: 1 / 4; display:flex; gap:10px;">
+          <button type="button" id="btnGuardarRecibo">Guardar recibo</button>
+          <button type="button" id="btnNuevoRecibo">Nuevo</button>
+        </div>
+      </div>
+
+      <div class="tabla-recibos">
+        <table border="1" cellpadding="6" cellspacing="0" width="100%">
+          <thead>
+            <tr>
+              <th>No. Recibo</th>
+              <th>Fecha</th>
+              <th>Monto</th>
+              <th>Observaciones</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaRecibosBody">
+            <tr><td colspan="6">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -630,6 +732,187 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+// recibos
+(function () {
+    const idProtocoloInput = document.querySelector('input[name="id_protocolo"]');
+    const idProtocolo = idProtocoloInput ? idProtocoloInput.value : '';
+
+    const modal = document.getElementById('modalRecibos');
+    const btnVerRecibos = document.getElementById('btnVerRecibos');
+    const btnCerrarModal = document.getElementById('btnCerrarModalRecibos');
+    const btnGuardarRecibo = document.getElementById('btnGuardarRecibo');
+    const btnNuevoRecibo = document.getElementById('btnNuevoRecibo');
+    const tablaBody = document.getElementById('tablaRecibosBody');
+    const resumen = document.getElementById('resumen_recibos');
+
+    function limpiarFormularioRecibo() {
+        document.getElementById('id_recibo').value = '';
+        document.getElementById('numero_recibo').value = '';
+        document.getElementById('fecha_recibo').value = '';
+        document.getElementById('monto_recibo').value = '';
+        document.getElementById('observaciones_recibo').value = '';
+    }
+
+    async function cargarResumenRecibos() {
+        if (!idProtocolo) return;
+
+        const res = await fetch(`controllers/recibos/obtener_resumen_recibos.php?id_protocolo=${idProtocolo}`);
+        const data = await res.json();
+
+        if (!data.ok) return;
+
+        if (data.cantidad > 0) {
+            resumen.textContent = `${data.cantidad} recibo(s) registrado(s) | Total Q ${Number(data.total).toFixed(2)}`;
+        } else {
+            resumen.textContent = 'Sin recibos registrados';
+        }
+    }
+
+    async function listarRecibos() {
+        if (!idProtocolo) return;
+
+        tablaBody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
+
+        const res = await fetch(`controllers/recibos/listar_recibos.php?id_protocolo=${idProtocolo}`);
+        const data = await res.json();
+
+        if (!data.ok) {
+            tablaBody.innerHTML = '<tr><td colspan="6">Error al cargar recibos</td></tr>';
+            return;
+        }
+
+        if (!data.data.length) {
+            tablaBody.innerHTML = '<tr><td colspan="6">No hay recibos registrados</td></tr>';
+            return;
+        }
+
+        tablaBody.innerHTML = '';
+
+        data.data.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.numero_recibo ?? ''}</td>
+                <td>${r.fecha_recibo ?? ''}</td>
+                <td>${Number(r.monto ?? 0).toFixed(2)}</td>
+                <td>${r.observaciones ?? ''}</td>
+                <td>${r.anulado === true || r.anulado === 't' ? 'Anulado' : 'Activo'}</td>
+                <td>
+                    ${!(r.anulado === true || r.anulado === 't') ? `
+                        <button type="button" class="btn-editar-recibo"
+                            data-id="${r.id_recibo}"
+                            data-numero="${encodeURIComponent(r.numero_recibo ?? '')}"
+                            data-fecha="${r.fecha_recibo ?? ''}"
+                            data-monto="${r.monto ?? ''}"
+                            data-obs="${encodeURIComponent(r.observaciones ?? '')}">
+                            Editar
+                        </button>
+                        <button type="button" class="btn-anular-recibo" data-id="${r.id_recibo}">
+                            Eliminar
+                        </button>
+                    ` : ''}
+                </td>
+            `;
+            tablaBody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-editar-recibo').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('id_recibo').value = this.dataset.id;
+                document.getElementById('numero_recibo').value = decodeURIComponent(this.dataset.numero || '');
+                document.getElementById('fecha_recibo').value = this.dataset.fecha || '';
+                document.getElementById('monto_recibo').value = this.dataset.monto || '';
+                document.getElementById('observaciones_recibo').value = decodeURIComponent(this.dataset.obs || '');
+            });
+        });
+
+        document.querySelectorAll('.btn-anular-recibo').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                if (!confirm('¿Desea eliminar/anular este recibo?')) return;
+
+                const fd = new FormData();
+                fd.append('id_recibo', this.dataset.id);
+
+                const res = await fetch('controllers/recibos/anular_recibo.php', {
+                    method: 'POST',
+                    body: fd
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.ok) {
+                    alert(data.mensaje || 'No se pudo anular');
+                    return;
+                }
+
+                await listarRecibos();
+                await cargarResumenRecibos();
+                limpiarFormularioRecibo();
+            });
+        });
+    }
+
+    if (btnVerRecibos) {
+        btnVerRecibos.addEventListener('click', async function () {
+            if (!idProtocolo) {
+                alert('Primero debe guardar el protocolo');
+                return;
+            }
+
+            modal.style.display = 'flex';
+            limpiarFormularioRecibo();
+            await listarRecibos();
+        });
+    }
+
+    if (btnCerrarModal) {
+        btnCerrarModal.addEventListener('click', async function () {
+            modal.style.display = 'none';
+            await cargarResumenRecibos();
+        });
+    }
+
+    if (btnNuevoRecibo) {
+        btnNuevoRecibo.addEventListener('click', function () {
+            limpiarFormularioRecibo();
+        });
+    }
+
+    if (btnGuardarRecibo) {
+        btnGuardarRecibo.addEventListener('click', async function () {
+            if (!idProtocolo) {
+                alert('Primero debe guardar el protocolo');
+                return;
+            }
+
+            const fd = new FormData();
+            fd.append('id_recibo', document.getElementById('id_recibo').value);
+            fd.append('id_protocolo', idProtocolo);
+            fd.append('numero_recibo', document.getElementById('numero_recibo').value);
+            fd.append('fecha_recibo', document.getElementById('fecha_recibo').value);
+            fd.append('monto', document.getElementById('monto_recibo').value);
+            fd.append('observaciones', document.getElementById('observaciones_recibo').value);
+
+            const res = await fetch('controllers/recibos/guardar_recibo.php', {
+                method: 'POST',
+                body: fd
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.ok) {
+                alert(data.mensaje || 'No se pudo guardar el recibo');
+                return;
+            }
+
+            alert(data.mensaje);
+            limpiarFormularioRecibo();
+            await listarRecibos();
+            await cargarResumenRecibos();
+        });
+    }
+
+    cargarResumenRecibos();
+})(); 
 </script>
 
 <?php include "modal_buscar_cliente.php"; ?>
