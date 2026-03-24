@@ -17,13 +17,15 @@ $rol = $_SESSION['usuario']['rol_nombre'];
 $id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
 
 if ($busqueda === '') {
-    $sql = "SELECT id_protocolo,id_tipo_protocolo, fecha , id_cliente
-            FROM protocolos 
+    $sql = "SELECT id_protocolo,id_tipo_protocolo, fecha , p.id_cliente
+            FROM protocolos p
+            inner  join clientes cl on 
+                cl.id_cliente = p.idcliente
             where 1=1 ";
 
             
 if ($rol === 'cliente') {
-    $sql .= " and id_cliente = :id_cliente ";
+    $sql .= " and p.id_cliente = :id_cliente ";
 }
  
            $sql .= " ORDER BY fecha DESC 
@@ -33,12 +35,14 @@ if ($rol === 'cliente') {
         $stmt->bindValue(':id_cliente', $id_cliente_sesion, PDO::PARAM_INT);
     }
 } else {
-    $sql = "SELECT id_protocolo, id_tipo_protocolo, fecha , id_cliente
-            FROM protocolos 
+    $sql = "SELECT id_protocolo, id_tipo_protocolo, fecha , p.id_cliente, c.nombre
+            FROM protocolos p
+            inner  join clientes cl on 
+                cl.id_cliente = p.idcliente
             WHERE (CAST(id_tipo_protocolo AS TEXT) ILIKE :busqueda 
                OR CAST(fecha AS TEXT) ILIKE :busqueda
                or CAST(id_protocolo AS TEXT) ILIKE :busqueda 
-               or CAST(id_cliente AS TEXT) ILIKE :busqueda)";
+               or CAST(p.id_cliente AS TEXT) ILIKE :busqueda)";
             
 if ($rol === 'cliente') {
     $sql .= " and id_cliente = :id_cliente ";

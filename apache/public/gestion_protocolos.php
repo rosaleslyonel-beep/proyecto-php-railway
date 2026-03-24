@@ -486,7 +486,7 @@ function cargarProtocolos(reset = false) {
                 protocolos.forEach(p => {
                     const li = document.createElement('li');
                     li.className = "cliente-item" + (p.id_protocolo == actual ? " activo" : "");
-                    li.innerHTML = `<a href="gestion_protocolos.php?id=${p.id_protocolo}">Protocolo:${p.id_protocolo} <br/>Cliente:${p.id_cliente}  <br/>Fecha: ${p.fecha}</a>`;
+                    li.innerHTML = `<a href="gestion_protocolos.php?id=${p.id_protocolo}">Protocolo:${p.id_protocolo} <br/>Cliente:${p.id_cliente} -${p.nombre}  <br/>Fecha: ${p.fecha}</a>`;
                     lista.appendChild(li);
                 });
             }
