@@ -827,29 +827,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         document.querySelectorAll('.btn-anular-recibo').forEach(btn => {
-            btn.addEventListener('click', async function () {
-                if (!confirm('¿Desea eliminar/anular este recibo?')) return;
+        btn.addEventListener('click', async function () {
+            if (!confirm('¿Desea eliminar/anular este recibo?')) return;
 
-                const fd = new FormData();
-                fd.append('id_recibo', this.dataset.id);
+            const fd = new FormData();
+            fd.append('id_recibo', this.dataset.id);
 
+            try {
                 const res = await fetch('controllers/recibos/anular_recibo.php', {
                     method: 'POST',
                     body: fd
                 });
 
-                const data = await res.json();
+                const raw = await res.text();
+                console.log('Respuesta raw anular_recibo:', raw);
+
+                let data;
+                try {
+                    data = JSON.parse(raw);
+                } catch (e) {
+                    alert('La respuesta del servidor no es JSON válido.\nRevise consola.');
+                    console.error('JSON inválido:', raw);
+                    return;
+                }
+
                 if (!res.ok || !data.ok) {
-                    console.error('Error al anular recibo:', data);
                     alert((data.mensaje || 'No se pudo anular') + (data.detalle ? '\n' + data.detalle : ''));
                     return;
                 }
 
+                alert(data.mensaje || 'Recibo anulado correctamente');
                 await listarRecibos();
                 await cargarResumenRecibos();
                 limpiarFormularioRecibo();
-            });
+
+            } catch (e) {
+                console.error('Error fetch anular_recibo:', e);
+                alert('Error al procesar la anulación: ' + e.message);
+            }
         });
+});
     }
 
     if (btnVerRecibos) {
