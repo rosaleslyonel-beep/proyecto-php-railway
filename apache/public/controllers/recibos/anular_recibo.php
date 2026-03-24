@@ -13,7 +13,7 @@ if (!in_array($rol, ['admin', 'recepcion'], true)) {
 
 $id_usuario    = (int)($_SESSION['id_usuario'] ?? 0);
 $id_recibo     = (int)($_POST['id_recibo'] ?? 0);
-$id_protocolo  = (int)($_POST['id_protocolo'] ?? 0);
+$id_protocolo  = (int)($_POST['id'] ?? 0);
 $numero_recibo = trim($_POST['numero_recibo'] ?? '');
 $fecha_recibo  = trim($_POST['fecha_recibo'] ?? '');
 $monto         = trim($_POST['monto'] ?? '');
