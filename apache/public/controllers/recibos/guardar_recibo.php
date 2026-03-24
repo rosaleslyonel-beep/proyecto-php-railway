@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../config/helpers.php';
 
 header('Content-Type: application/json');
 
-$rol = strtolower(trim($_SESSION['rol'] ?? ''));
-if (!in_array($rol, ['admin', 'recepcion'], true)) {
+$rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
+if (!in_array($rol, ['Admin', 'recepcion'], true)) {
     http_response_code(403);
     echo json_encode(['ok' => false, 'mensaje' => 'No autorizado']);
     exit;
