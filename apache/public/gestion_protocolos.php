@@ -840,7 +840,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await res.json();
                 if (!res.ok || !data.ok) {
-                    alert(data.mensaje || 'No se pudo anular');
+                    console.error('Error al anular recibo:', data);
+                    alert((data.mensaje || 'No se pudo anular') + (data.detalle ? '\n' + data.detalle : ''));
                     return;
                 }
 
