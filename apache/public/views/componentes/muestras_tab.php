@@ -59,7 +59,7 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
 </div>
 <div id="contenedor-formulario-muestras" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
 <!-- Formulario -->
-    <form id="form_muestra" method="POST" action="controllers/agregar_muestra.php">
+    <form id="form_muestra" method="POST" action="controllers/guardar_muestra.php">
     <input type="hidden" id="tipo_protocolo_hidden" value="<?= htmlspecialchars($tipo_protocolo_actual) ?>">
 
         <input type="hidden" name="id_muestra" id="id_muestra">
