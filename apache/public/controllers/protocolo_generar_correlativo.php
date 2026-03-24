@@ -130,7 +130,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'ok' => false,
-        'mensaje' => 'Error al generar correlativo--',
+        'mensaje' => $e->getMessage() ,
         'detalle' => $e->getMessage()
     ]);
 }
