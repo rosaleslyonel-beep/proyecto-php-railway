@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY apache/ /app/
+COPY apache/public/ /var/www/html/
 
 RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini
 
