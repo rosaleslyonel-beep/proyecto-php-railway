@@ -99,21 +99,21 @@ try {
     ]);
     $correlativo = $stmt->fetchColumn();
 
-    $stmt = $conexion->prepare("
-        UPDATE public.protocolos
-           SET correlativo = :correlativo,
-               correlativo_forzado = :correlativo_forzado,
-               correlativo_motivo = :correlativo_motivo,
-               pago_confirmado = CASE WHEN :cantidad_recibos > 0 THEN true ELSE pago_confirmado END
-         WHERE id_protocolo = :id_protocolo
-    ");
-    $stmt->execute([
-        ':correlativo' => $correlativo,
-        ':correlativo_forzado' => ($forzar === 1),
-        ':correlativo_motivo' => ($forzar === 1 ? $motivo : null),
-        ':cantidad_recibos' => $cantidadRecibos,
-        ':id_protocolo' => $id_protocolo
-    ]);
+   $stmt = $conexion->prepare("
+    UPDATE public.protocolos
+       SET correlativo = :correlativo,
+           correlativo_forzado = :correlativo_forzado,
+           correlativo_motivo = :correlativo_motivo,
+           pago_confirmado = CASE WHEN :cantidad_recibos > 0 THEN true ELSE pago_confirmado END
+     WHERE id_protocolo = :id_protocolo
+");
+
+$stmt->bindValue(':correlativo', $correlativo, PDO::PARAM_STR);
+$stmt->bindValue(':correlativo_forzado', ($forzar === 1), PDO::PARAM_BOOL);
+$stmt->bindValue(':correlativo_motivo', ($forzar === 1 ? $motivo : null), ($forzar === 1 ? PDO::PARAM_STR : PDO::PARAM_NULL));
+$stmt->bindValue(':cantidad_recibos', $cantidadRecibos, PDO::PARAM_INT);
+$stmt->bindValue(':id_protocolo', $id_protocolo, PDO::PARAM_INT);
+$stmt->execute();
 
     $conexion->commit();
 
