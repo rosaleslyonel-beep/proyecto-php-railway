@@ -10,4 +10,4 @@ COPY /apache/public/ /var/www/html/
 
 RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini
 
-CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /app/public"]
+CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /var/www/html/"]
