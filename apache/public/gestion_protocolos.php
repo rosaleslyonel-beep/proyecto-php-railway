@@ -245,7 +245,7 @@ include "views/menu.php";
                         <!-- reciboss -->
                          <?php
                             $rolSesion = strtolower(trim($_SESSION['rol'] ?? ''));
-                            $puedeGestionarRecibos = in_array($rolSesion, ['admin', 'recepcion'], true);
+                            $puedeGestionarRecibos = in_array($rolSesion, ['Admin', 'recepcion'], true);
                         ?>
                         <div class="campo">
                             <label>Correlativo:</label>
