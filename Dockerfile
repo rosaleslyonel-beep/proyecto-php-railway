@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY apache/public/ /app/
+COPY apache/ /app/
 
 RUN echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max-input-vars.ini
 
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app"]
+CMD ["sh", "-c", "php -S 0.0.0.0:$PORT -t /app/public"]
