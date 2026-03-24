@@ -913,6 +913,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cargarResumenRecibos();
 })(); 
+
+
+
+//generar correlativo 
+
+document.getElementById('btnGenerarCorrelativo')?.addEventListener('click', async function () {
+
+    const idInput = document.querySelector('input[name="id_protocolo"]');
+    const idProtocolo = idInput ? idInput.value : '';
+
+    if (!idProtocolo) {
+        alert('Primero debe guardar el protocolo');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('id_protocolo', idProtocolo);
+    fd.append('forzar', '0');
+    fd.append('motivo', '');
+
+    try {
+        const res = await fetch('controllers/protocolo_generar_correlativo.php', {
+            method: 'POST',
+            body: fd
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+            throw new Error(data.mensaje || 'Error al generar correlativo');
+        }
+
+        document.getElementById('correlativo').value = data.correlativo;
+
+        alert('Correlativo generado: ' + data.correlativo);
+
+    } catch (e) {
+        alert(e.message);
+    }
+});
 </script>
 
 <?php include "modal_buscar_cliente.php"; ?>
