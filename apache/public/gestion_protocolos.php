@@ -244,7 +244,7 @@ include "views/menu.php";
                         </div>
                         <!-- reciboss -->
                          <?php
-                            $rolSesion = strtolower(trim($_SESSION['rol'] ?? ''));
+                            $rolSesion = strtolower(trim($_SESSION['rol_nombre'] ?? ''));
                             $puedeGestionarRecibos = in_array($rolSesion, ['Admin', 'recepcion'], true);
                         ?>
                         <div class="campo">
