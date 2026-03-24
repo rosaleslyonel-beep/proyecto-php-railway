@@ -175,6 +175,7 @@ include "views/menu.php";
                     🧾 Ver Boleta de Cobro
                 </a>
             <?php endif; ?>
+            
 
         </div>
 
@@ -204,10 +205,25 @@ include "views/menu.php";
                             <?php endif; ?>
                         </div>
                         <div class="campo">
-                            <?php if ($protocolo): ?>
-                            
-                            <?php endif; ?>
-                        </div>
+    <label>Recibos:</label>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input type="text" id="resumen_recibos" value="Sin recibos registrados" readonly style="background:#f5f5f5; min-width:240px;">
+        <button type="button" id="btnAdministrarRecibos">Administrar recibos</button>
+    </div>
+</div>
+
+<div class="campo">
+    <label>Correlativo:</label>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input type="text" id="correlativo" name="correlativo"
+               value="<?= htmlspecialchars($protocolo['correlativo'] ?? '') ?>"
+               readonly style="background:#f5f5f5; min-width:220px;">
+
+        <?php if (in_array(strtolower($_SESSION['rol'] ?? ''), ['admin','recepcion'], true)): ?>
+            <button type="button" id="btnGenerarCorrelativo">Generar correlativo</button>
+        <?php endif; ?>
+    </div>
+</div>
                         <div class="campo">
                                     <!-- Cliente -->
                             <?php if ($rol !== 'cliente'): ?>
