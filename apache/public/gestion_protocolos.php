@@ -257,10 +257,10 @@ include "views/menu.php";
                                     readonly
                                     style="background:#f5f5f5; min-width:220px;">
 
-                                <?php if ($puedeGestionarRecibos): ?>
+                                <?php //if ($puedeGestionarRecibos): ?>
                                     <button type="button" id="btnVerRecibos">💵 Recibos</button>
                                     <button type="button" id="btnGenerarCorrelativo">⚙️ Generar correlativo</button>
-                                <?php endif; ?>
+                                <?php //endif; ?>
                             </div>
 
                             <small id="resumen_recibos" style="display:block; margin-top:6px; color:#666;">
