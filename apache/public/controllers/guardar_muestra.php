@@ -45,59 +45,64 @@ $fecha_hoy  = date("Y-m-d H:i:s");
 
 try {
     if (!empty($id_muestra) && is_numeric($id_muestra)) {
-        $stmt = $conexion->prepare("
-            UPDATE muestras
-               SET tipo_muestra = :tipo_muestra,
-                   lote = :lote,
-                   cantidad = :cantidad,
-                   edad = :edad,
-                   variedad = :variedad,
-                   tipo_vacuna = :tipo_vacuna,
-                   marca_vacuna = :marca_vacuna,
-                   dosis = :dosis,
-                   fecha_elaboracion = :fecha_elaboracion,
-                   fecha_vencimiento = :fecha_vencimiento,
-                   wssv = :wssv,
-                   tsv = :tsv,
-                   ihhnv = :ihhnv,
-                   imnv = :imnv,
-                   yhv = :yhv,
-                   mrnv = :mrnv,
-                   pvnv = :pvnv,
-                   ahpnd_ems = :ahpnd_ems,
-                   ehp = :ehp,
-                   nhpb = :nhpb,
-                   div1 = :div1,
-                   updated_by = :updated_by,
-                   updated_date = :updated_date
-             WHERE id_muestra = :id_muestra
-        ");
-        $stmt->execute([
-            ':tipo_muestra' => $tipo_muestra,
-            ':lote' => $lote,
-            ':cantidad' => $cantidad,
-            ':edad' => $edad,
-            ':variedad' => $variedad ?: null,
-            ':tipo_vacuna' => $tipo_vacuna ?: null,
-            ':marca_vacuna' => $marca_vacuna ?: null,
-            ':dosis' => $dosis ?: null,
-            ':fecha_elaboracion' => $fecha_elaboracion ?: null,
-            ':fecha_vencimiento' => $fecha_vencimiento ?: null,
-            ':wssv' => $wssv,
-            ':tsv' => $tsv,
-            ':ihhnv' => $ihhnv,
-            ':imnv' => $imnv,
-            ':yhv' => $yhv,
-            ':mrnv' => $mrnv,
-            ':pvnv' => $pvnv,
-            ':ahpnd_ems' => $ahpnd_ems,
-            ':ehp' => $ehp,
-            ':nhpb' => $nhpb,
-            ':div1' => $div1,
-            ':updated_by' => $id_usuario,
-            ':updated_date' => $fecha_hoy,
-            ':id_muestra' => $id_muestra
-        ]);
+      $stmt = $conexion->prepare("
+    UPDATE muestras
+       SET tipo_muestra = :tipo_muestra,
+           lote = :lote,
+           cantidad = :cantidad,
+           edad = :edad,
+           variedad = :variedad,
+           tipo_vacuna = :tipo_vacuna,
+           marca_vacuna = :marca_vacuna,
+           dosis = :dosis,
+           fecha_elaboracion = :fecha_elaboracion,
+           fecha_vencimiento = :fecha_vencimiento,
+           wssv = :wssv,
+           tsv = :tsv,
+           ihhnv = :ihhnv,
+           imnv = :imnv,
+           yhv = :yhv,
+           mrnv = :mrnv,
+           pvnv = :pvnv,
+           ahpnd_ems = :ahpnd_ems,
+           ehp = :ehp,
+           nhpb = :nhpb,
+           div1 = :div1,
+           updated_by = :updated_by,
+           updated_date = :updated_date
+     WHERE id_muestra = :id_muestra
+");
+$stmt->bindValue(':tipo_muestra', $tipo_muestra, PDO::PARAM_STR);
+$stmt->bindValue(':lote', $lote, PDO::PARAM_STR);
+$stmt->bindValue(':cantidad', $cantidad);
+$stmt->bindValue(':edad', $edad);
+
+$stmt->bindValue(':variedad', $variedad !== '' ? $variedad : null, $variedad !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+$stmt->bindValue(':tipo_vacuna', $tipo_vacuna !== '' ? $tipo_vacuna : null, $tipo_vacuna !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+$stmt->bindValue(':marca_vacuna', $marca_vacuna !== '' ? $marca_vacuna : null, $marca_vacuna !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+$stmt->bindValue(':dosis', $dosis !== '' ? $dosis : null, $dosis !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+
+$stmt->bindValue(':fecha_elaboracion', $fecha_elaboracion ?: null, $fecha_elaboracion ? PDO::PARAM_STR : PDO::PARAM_NULL);
+$stmt->bindValue(':fecha_vencimiento', $fecha_vencimiento ?: null, $fecha_vencimiento ? PDO::PARAM_STR : PDO::PARAM_NULL);
+
+# 🔥 IMPORTANTE: BOOLEANOS
+$stmt->bindValue(':wssv', $wssv, PDO::PARAM_BOOL);
+$stmt->bindValue(':tsv', $tsv, PDO::PARAM_BOOL);
+$stmt->bindValue(':ihhnv', $ihhnv, PDO::PARAM_BOOL);
+$stmt->bindValue(':imnv', $imnv, PDO::PARAM_BOOL);
+$stmt->bindValue(':yhv', $yhv, PDO::PARAM_BOOL);
+$stmt->bindValue(':mrnv', $mrnv, PDO::PARAM_BOOL);
+$stmt->bindValue(':pvnv', $pvnv, PDO::PARAM_BOOL);
+$stmt->bindValue(':ahpnd_ems', $ahpnd_ems, PDO::PARAM_BOOL);
+$stmt->bindValue(':ehp', $ehp, PDO::PARAM_BOOL);
+$stmt->bindValue(':nhpb', $nhpb, PDO::PARAM_BOOL);
+$stmt->bindValue(':div1', $div1, PDO::PARAM_BOOL);
+
+$stmt->bindValue(':updated_by', $id_usuario, PDO::PARAM_INT);
+$stmt->bindValue(':updated_date', $fecha_hoy, PDO::PARAM_STR);
+$stmt->bindValue(':id_muestra', $id_muestra, PDO::PARAM_INT);
+
+$stmt->execute();
     } else {
         $stmt = $conexion->prepare("
                 INSERT INTO muestras (
@@ -161,7 +166,7 @@ try {
         }
     }
 
-    header("Location: ../gestion_protocolos.php?id={$id_protocolo}&tab=muestras");
+    header("Location: ../gestion_protocolos.php?id={$id_protocolo}&tab=tab_muestras");
     exit();
 
 } catch (Throwable $e) {

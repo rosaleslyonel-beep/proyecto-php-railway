@@ -56,6 +56,12 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
     <button type="button" onclick="guardarMuestra()">💾 Guardar</button>
   <!--   <button type="button" onclick="refrescarMuestras()">🔄 Refrescar</button>-->
     <button type="button" id="btnEliminar" onclick="eliminarMuestra()" disabled>🗑 Eliminar</button>
+    <button type="button"
+            class="btn-eliminar-muestra"
+            data-id="<?= $m['id_muestra'] ?>"
+            data-protocolo="<?= $id_protocolo ?>">
+        🗑 Eliminar
+    </button>
 </div>
 <div id="contenedor-formulario-muestras" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
 <!-- Formulario -->
@@ -324,3 +330,57 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
     }
 
 </script>    
+
+<script>
+document.querySelectorAll('.btn-eliminar-muestra').forEach(btn => {
+    btn.addEventListener('click', async function () {
+        const idMuestra = this.dataset.id;
+        const idProtocolo = this.dataset.protocolo;
+
+        if (!idMuestra) {
+            alert('No se encontró el ID de la muestra.');
+            return;
+        }
+
+        if (!confirm('¿Desea eliminar esta muestra?')) {
+            return;
+        }
+
+        try {
+            const fd = new FormData();
+            fd.append('id_muestra', idMuestra);
+            fd.append('id_protocolo', idProtocolo || '');
+
+            const res = await fetch('controllers/eliminar_muestra.php', {
+                method: 'POST',
+                body: fd
+            });
+
+            const raw = await res.text();
+
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (e) {
+                console.error('Respuesta no JSON:', raw);
+                alert('El servidor devolvió una respuesta no válida al eliminar la muestra.');
+                return;
+            }
+
+            if (!res.ok || !data.ok) {
+                alert(data.mensaje || 'No se pudo eliminar la muestra.');
+                return;
+            }
+
+            alert(data.mensaje || 'Muestra eliminada correctamente.');
+
+            // opción simple: recargar la página en la pestaña muestras
+            window.location.href = `gestion_protocolos.php?id=${idProtocolo}&tab=muestras`;
+
+        } catch (e) {
+            console.error('Error al eliminar muestra:', e);
+            alert('Ocurrió un error al intentar eliminar la muestra.');
+        }
+    });
+});
+</script>
