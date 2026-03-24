@@ -55,7 +55,7 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
     <button type="button" onclick="nuevaMuestra()">➕ Nuevo</button>
     <button type="button" onclick="guardarMuestra()">💾 Guardar</button>
   <!--   <button type="button" onclick="refrescarMuestras()">🔄 Refrescar</button>-->
-    <button type="button" id="btnEliminar" onclick="eliminarMuestra()" disabled>🗑 Eliminar</button>
+ <!--     <button type="button" id="btnEliminar" onclick="eliminarMuestra()" disabled>🗑 Eliminar</button>-->
     <button type="button"
             class="btn-eliminar-muestra"
             data-id="<?= $m['id_muestra'] ?>"
@@ -375,7 +375,7 @@ document.querySelectorAll('.btn-eliminar-muestra').forEach(btn => {
             alert(data.mensaje || 'Muestra eliminada correctamente.');
 
             // opción simple: recargar la página en la pestaña muestras
-            window.location.href = `gestion_protocolos.php?id=${idProtocolo}&tab=muestras`;
+            window.location.href = `gestion_protocolos.php?id=${idProtocolo}&tab=tab_muestras`;
 
         } catch (e) {
             console.error('Error al eliminar muestra:', e);
