@@ -1,60 +1,136 @@
 <?php
-require_once "../config/database.php";
 session_start();
+require_once __DIR__ . '/../config/helpers.php';
 
+header('Content-Type: application/json');
 
-$id_protocolo = (int)($_POST['id_protocolo'] ?? 0);
-
-if ($id_protocolo <= 0) {
-    http_response_code(400);
-    exit('Protocolo inválido');
-}
-
-$pdo->beginTransaction();
-
-// 1. Obtener datos básicos del protocolo
-$sql = "SELECT id_protocolo, id_tipo_protocolo, fecha_creacion, correlativo
-          FROM public.protocolos
-         WHERE id_protocolo = :id
-         FOR UPDATE";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([':id' => $id_protocolo]);
-$protocolo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$protocolo) {
-    $pdo->rollBack();
-    http_response_code(404);
-    exit('Protocolo no encontrado');
-}
-
-// Si ya tiene correlativo, solo lo devolvemos
-if (!empty($protocolo['correlativo'])) {
-    $pdo->commit();
-    header('Content-Type: application/json');
-    echo json_encode(['correlativo' => $protocolo['correlativo']]);
+if (!isset($_SESSION['usuario'])) {
+    http_response_code(401);
+    echo json_encode(['ok' => false, 'mensaje' => 'Sesión no válida']);
     exit;
 }
 
-// 2. Generar nuevo correlativo usando la función de Postgres
-$sqlGen = "SELECT public.generar_correlativo_protocolo(:tipo, :fecha) AS correlativo";
-$stmtGen = $pdo->prepare($sqlGen);
-$stmtGen->execute([
-    ':tipo'  => $protocolo['id_tipo_protocolo'],
-    ':fecha' => $protocolo['fecha_creacion'] ?? date('Y-m-d'),
-]);
-$correlativo = $stmtGen->fetchColumn();
+$rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
+if (!in_array($rol, ['admin', 'recepcion'], true)) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'mensaje' => 'No autorizado']);
+    exit;
+}
 
-// 3. Guardar en el protocolo
-$sqlUpd = "UPDATE public.protocolos
-              SET correlativo = :corr
-            WHERE id_protocolo = :id";
-$stmtUpd = $pdo->prepare($sqlUpd);
-$stmtUpd->execute([
-    ':corr' => $correlativo,
-    ':id'   => $id_protocolo,
-]);
+$id_protocolo = (int)($_POST['id_protocolo'] ?? 0);
+$forzar       = (int)($_POST['forzar'] ?? 0);
+$motivo       = trim($_POST['motivo'] ?? '');
 
-$pdo->commit();
+if ($id_protocolo <= 0) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'mensaje' => 'Protocolo inválido']);
+    exit;
+}
 
-header('Content-Type: application/json');
-echo json_encode(['correlativo' => $correlativo]);
+try {
+    $conexion->beginTransaction();
+
+    $stmt = $conexion->prepare("
+        SELECT id_protocolo,
+               id_tipo_protocolo,
+               fecha,
+               correlativo
+          FROM public.protocolos
+         WHERE id_protocolo = :id_protocolo
+         FOR UPDATE
+    ");
+    $stmt->execute([':id_protocolo' => $id_protocolo]);
+    $protocolo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$protocolo) {
+        $conexion->rollBack();
+        http_response_code(404);
+        echo json_encode(['ok' => false, 'mensaje' => 'Protocolo no encontrado']);
+        exit;
+    }
+
+    if (!empty($protocolo['correlativo'])) {
+        $conexion->commit();
+        echo json_encode([
+            'ok' => true,
+            'correlativo' => $protocolo['correlativo'],
+            'mensaje' => 'El protocolo ya tiene correlativo'
+        ]);
+        exit;
+    }
+
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS cantidad
+          FROM public.protocolo_recibos
+         WHERE id_protocolo = :id_protocolo
+           AND anulado = false
+    ");
+    $stmt->execute([':id_protocolo' => $id_protocolo]);
+    $cantidadRecibos = (int)$stmt->fetchColumn();
+
+    if ($cantidadRecibos <= 0) {
+        if ($forzar !== 1) {
+            $conexion->rollBack();
+            http_response_code(409);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'No se puede generar correlativo sin recibos registrados'
+            ]);
+            exit;
+        }
+
+        if ($motivo === '') {
+            $conexion->rollBack();
+            http_response_code(400);
+            echo json_encode([
+                'ok' => false,
+                'mensaje' => 'Debe ingresar un motivo para forzar el correlativo sin recibos'
+            ]);
+            exit;
+        }
+    }
+
+    $stmt = $conexion->prepare("
+        SELECT public.generar_correlativo_protocolo(:id_tipo_protocolo, :fecha) AS correlativo
+    ");
+    $stmt->execute([
+        ':id_tipo_protocolo' => $protocolo['id_tipo_protocolo'],
+        ':fecha' => $protocolo['fecha'] ?: date('Y-m-d')
+    ]);
+    $correlativo = $stmt->fetchColumn();
+
+    $stmt = $conexion->prepare("
+        UPDATE public.protocolos
+           SET correlativo = :correlativo,
+               correlativo_forzado = :correlativo_forzado,
+               correlativo_motivo = :correlativo_motivo,
+               pago_confirmado = CASE WHEN :cantidad_recibos > 0 THEN true ELSE pago_confirmado END
+         WHERE id_protocolo = :id_protocolo
+    ");
+    $stmt->execute([
+        ':correlativo' => $correlativo,
+        ':correlativo_forzado' => ($forzar === 1),
+        ':correlativo_motivo' => ($forzar === 1 ? $motivo : null),
+        ':cantidad_recibos' => $cantidadRecibos,
+        ':id_protocolo' => $id_protocolo
+    ]);
+
+    $conexion->commit();
+
+    echo json_encode([
+        'ok' => true,
+        'correlativo' => $correlativo,
+        'mensaje' => 'Correlativo generado correctamente'
+    ]);
+} catch (Throwable $e) {
+    if ($conexion->inTransaction()) {
+        $conexion->rollBack();
+    }
+
+    http_response_code(500);
+    echo json_encode([
+        'ok' => false,
+        'mensaje' => 'Error al generar correlativo',
+        'detalle' => $e->getMessage()
+    ]);
+}
