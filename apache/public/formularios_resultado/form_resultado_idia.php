@@ -80,7 +80,7 @@ if ($id_muestra && $id_analisis) {
         }
 
         function regresar() {
-            window.location.href = 'gestion_protocolos.php?tab=tab_resultados&id=' + <?= json_encode($id_muestra) ?>;
+            window.location.href = 'gestion_protocolos.php?tab=tab_resultados&id=' + <?= json_encode($id_protocolo) ?>;
         }
 
         function prepararEnvio() {
