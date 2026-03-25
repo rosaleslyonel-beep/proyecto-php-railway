@@ -1,7 +1,6 @@
+
 <?php
 // Tab de resultados de análisis por muestra dentro del protocolo
-$estadoProtocolo = $protocolo['estado'] ?? 'BORRADOR';
-$soloConsultaResultados = ($estadoProtocolo === 'CERRADO');
 
 // Obtener muestras del protocolo
 $stmt = $conexion->prepare("SELECT id_muestra, tipo_muestra FROM muestras WHERE id_protocolo = ?");
@@ -10,16 +9,6 @@ $muestras = $stmt->fetchAll();
 ?>
  
     <h3>📋 Resultados por Muestra</h3>
-
-    <?php if ($estadoProtocolo === 'BORRADOR'): ?>
-        <div style="background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px; margin-bottom:15px; border-radius:4px;">
-            Este protocolo aún está en <strong>BORRADOR</strong>. El ingreso de resultados debe realizarse cuando tenga correlativo y pase a <strong>PENDIENTE_RESULTADOS</strong>.
-        </div>
-    <?php elseif ($soloConsultaResultados): ?>
-        <div style="background:#e2e3e5; border:1px solid #c6c7c8; color:#41464b; padding:12px; margin-bottom:15px; border-radius:4px;">
-            Este protocolo está <strong>CERRADO</strong>. Los resultados quedan disponibles solo para consulta.
-        </div>
-    <?php endif; ?>
 
     <?php if (count($muestras) === 0): ?>
         <p>No hay muestras registradas en este protocolo.</p>
@@ -48,16 +37,13 @@ $muestras = $stmt->fetchAll();
 
                 foreach ($analisis as $a):
                     $estado = $a['tiene_resultado'] ? '✅ Ingresado' : '🕗 Pendiente';
-                    $textoAccion = $soloConsultaResultados
-                        ? '🔍 Ver'
-                        : ($a['tiene_resultado'] ? '🔍 Ver / Editar' : '✏️ Ingresar Resultado');
                 ?>
                     <tr>
                         <td><?= htmlspecialchars($a['nombre_estudio']) ?></td>
                         <td><?= $estado ?></td>
                         <td>
                             <a href="resultado_analisis.php?id_protocolo=<?= $id_protocolo ?>&id_muestra=<?= $muestra['id_muestra'] ?>&id_analisis=<?= $a['id_analisis'] ?>" class="btn btn-sm">
-                                <?= $textoAccion ?>
+                                <?= $a['tiene_resultado'] ? '🔍 Ver / Editar' : '✏️ Ingresar Resultado' ?>
                             </a>
                         </td>
                     </tr>
@@ -67,3 +53,4 @@ $muestras = $stmt->fetchAll();
             <br>
         <?php endforeach; ?>
     <?php endif; ?>
+ 

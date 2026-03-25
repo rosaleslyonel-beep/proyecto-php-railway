@@ -7,19 +7,16 @@ if (!isset($_SESSION['usuario'])) {
     exit();
 }
 
-$id = isset($_POST['id_protocolo']) && is_numeric($_POST['id_protocolo']) ? intval($_POST['id_protocolo']) : null;
+$id = isset($_POST['id_protocolo']) ? intval($_POST['id_protocolo']) : null;
 
-$rolSesion = strtolower(trim($_SESSION['usuario']['rol_nombre'] ?? ($_SESSION['usuario']['rol'] ?? '')));
-$id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
-$esCliente = ($rolSesion === 'cliente');
-
-$id_cliente = $esCliente
-    ? $id_cliente_sesion
+$rol = $_SESSION['usuario']['rol'];
+$id_cliente = ($rol === 'cliente') 
+    ? $_SESSION['usuario']['id_cliente'] 
     : ($_POST['id_cliente'] ?? null);
 
-$id_finca = $_POST['id_finca'] ?? null;
+$id_finca = $_POST['id_finca'];
 $id_tipo_protocolo = $_POST['id_tipo_protocolo'] ?? null;
-$fecha = $_POST['fecha'] ?? null;
+$fecha = $_POST['fecha'];
 $tipo_material = $_POST['tipo_material'] ?? '';
 $mv_remite = $_POST['mv_remite'] ?? '';
 $correo = $_POST['correo'] ?? '';
@@ -32,8 +29,10 @@ $prueba_solicitada = $_POST['prueba_solicitada'] ?? '';
 $material_solicitado = $_POST['material_solicitado'] ?? '';
 $observaciones = $_POST['observaciones'] ?? '';
 $estado_muestra = $_POST['estado_muestra'] ?? '';
-$entrega_personal = !empty($_POST['entrega_personal']);
-$entrega_correo = !empty($_POST['entrega_correo']);
+$entrega_personal = isset($_POST['entrega_personal']) ? true : false;
+$entrega_correo = isset($_POST['entrega_correo']) ? true : false;
+$entrega_personal = !empty($_POST['entrega_personal']) ? true : false;
+$entrega_correo = !empty($_POST['entrega_correo']) ? true : false;
 $firma = $_POST['firma_imagen'] ?? '';
 
 $id_usuario = $_SESSION['usuario']['id_usuario'] ?? 1;
@@ -41,26 +40,6 @@ $fecha_hoy = date("Y-m-d H:i:s");
 
 try {
     if ($id) {
-        $stmt = $conexion->prepare("
-            SELECT id_protocolo, id_cliente, COALESCE(estado, 'BORRADOR') AS estado
-            FROM protocolos
-            WHERE id_protocolo = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $protocoloActual = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$protocoloActual) {
-            die("El protocolo no existe.");
-        }
-
-        if ($esCliente && (int)$protocoloActual['id_cliente'] !== (int)$id_cliente_sesion) {
-            die("No tiene permiso para modificar este protocolo.");
-        }
-
-        if (($protocoloActual['estado'] ?? 'BORRADOR') !== 'BORRADOR') {
-            die("El protocolo ya no está en estado BORRADOR y no permite cambios en su estructura.");
-        }
-
         $stmt = $conexion->prepare("
             UPDATE protocolos SET 
                 id_cliente = :id_cliente,
@@ -103,18 +82,14 @@ try {
             ':material_solicitado' => $material_solicitado,
             ':observaciones' => $observaciones,
             ':estado_muestra' => $estado_muestra,
-            ':entrega_personal' => $entrega_personal,
-            ':entrega_correo' => $entrega_correo,
+            ':entrega_personal' => $entrega_personal ? 'true' : 'false',
+            ':entrega_correo' => $entrega_correo ? 'true' : 'false',
             ':firma' => $firma,
             ':usuario' => $id_usuario,
             ':fecha_act' => $fecha_hoy,
             ':id' => $id
         ]);
     } else {
-        if ($esCliente && empty($id_cliente_sesion)) {
-            die("No hay un cliente asociado a la sesión.");
-        }
-
         $stmt = $conexion->prepare("
             INSERT INTO protocolos (
                 id_cliente, id_finca, id_tipo_protocolo, fecha,
@@ -122,14 +97,14 @@ try {
                 coordenada_vertical, coordenada_horizontal, procedencia,
                 prueba_solicitada, material_solicitado, observaciones,
                 estado_muestra, entrega_personal, entrega_correo, firma_imagen,
-                estado, created_by, created_date
+                created_by, created_date
             ) VALUES (
                 :id_cliente, :id_finca, :id_tipo_protocolo, :fecha,
                 :tipo_material, :mv_remite, :correo, :departamento, :municipio,
                 :coordenada_vertical, :coordenada_horizontal, :procedencia,
                 :prueba_solicitada, :material_solicitado, :observaciones,
                 :estado_muestra, :entrega_personal, :entrega_correo, :firma,
-                'BORRADOR', :usuario, :fecha_act
+                :usuario, :fecha_act
             )
         ");
         $stmt->execute([
@@ -149,8 +124,8 @@ try {
             ':material_solicitado' => $material_solicitado,
             ':observaciones' => $observaciones,
             ':estado_muestra' => $estado_muestra,
-            ':entrega_personal' => $entrega_personal,
-            ':entrega_correo' => $entrega_correo,
+            ':entrega_personal' => $entrega_personal ? 'true' : 'false',
+            ':entrega_correo' => $entrega_correo ? 'true' : 'false',            
             ':firma' => $firma,
             ':usuario' => $id_usuario,
             ':fecha_act' => $fecha_hoy
@@ -158,10 +133,10 @@ try {
         $id = $conexion->lastInsertId();
     }
 
-    header("Location: ../gestion_protocolos.php?id=$id&msg=guardado");
+    header("Location: ../gestion_protocolos.php?id=$id");
     exit();
 
 } catch (PDOException $e) {
-    echo "<h3>Error al guardar el protocolo:</h3><pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+    echo "<h3>Error al guardar el protocolo:</h3><pre>" . $e->getMessage() . "</pre>";
     exit();
 }

@@ -34,8 +34,7 @@ try {
         SELECT id_protocolo,
                id_tipo_protocolo,
                fecha,
-               correlativo,
-               COALESCE(estado, 'BORRADOR') AS estado
+               correlativo
           FROM public.protocolos
          WHERE id_protocolo = :id_protocolo
          FOR UPDATE
@@ -50,59 +49,12 @@ try {
         exit;
     }
 
-    if (($protocolo['estado'] ?? 'BORRADOR') !== 'BORRADOR') {
-        $conexion->rollBack();
-        http_response_code(409);
-        echo json_encode([
-            'ok' => false,
-            'mensaje' => 'El protocolo ya no está en BORRADOR. No se puede generar correlativo nuevamente.'
-        ]);
-        exit;
-    }
-
     if (!empty($protocolo['correlativo'])) {
         $conexion->commit();
         echo json_encode([
             'ok' => true,
             'correlativo' => $protocolo['correlativo'],
             'mensaje' => 'El protocolo ya tiene correlativo'
-        ]);
-        exit;
-    }
-
-    $stmt = $conexion->prepare("
-        SELECT COUNT(*)
-          FROM public.muestras
-         WHERE id_protocolo = :id_protocolo
-    ");
-    $stmt->execute([':id_protocolo' => $id_protocolo]);
-    $cantidadMuestras = (int)$stmt->fetchColumn();
-
-    if ($cantidadMuestras <= 0) {
-        $conexion->rollBack();
-        http_response_code(409);
-        echo json_encode([
-            'ok' => false,
-            'mensaje' => 'No se puede generar correlativo porque el protocolo no tiene muestras registradas'
-        ]);
-        exit;
-    }
-
-    $stmt = $conexion->prepare("
-        SELECT COUNT(*)
-          FROM public.muestras m
-          JOIN public.muestra_analisis ma ON ma.id_muestra = m.id_muestra
-         WHERE m.id_protocolo = :id_protocolo
-    ");
-    $stmt->execute([':id_protocolo' => $id_protocolo]);
-    $cantidadAnalisis = (int)$stmt->fetchColumn();
-
-    if ($cantidadAnalisis <= 0) {
-        $conexion->rollBack();
-        http_response_code(409);
-        echo json_encode([
-            'ok' => false,
-            'mensaje' => 'No se puede generar correlativo porque el protocolo no tiene análisis asignados'
         ]);
         exit;
     }
@@ -150,7 +102,6 @@ try {
    $stmt = $conexion->prepare("
     UPDATE public.protocolos
        SET correlativo = :correlativo,
-           estado = 'PENDIENTE_RESULTADOS',
            correlativo_forzado = :correlativo_forzado,
            correlativo_motivo = :correlativo_motivo,
            pago_confirmado = CASE WHEN :cantidad_recibos > 0 THEN true ELSE pago_confirmado END

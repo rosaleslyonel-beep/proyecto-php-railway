@@ -38,14 +38,6 @@ if ($rol !== 'cliente') {
 
 $tipos  = $conexion->query("SELECT id_tipo_protocolo, nombre_tipo FROM tipos_protocolo ORDER BY 1")->fetchAll();
 
-$estado_protocolo = $protocolo['estado'] ?? 'BORRADOR';
-$protocolo_bloqueado = in_array($estado_protocolo, ['PENDIENTE_RESULTADOS', 'CERRADO'], true);
-$protocolo_cerrado = ($estado_protocolo === 'CERRADO');
-$estado_badge_color = [
-    'BORRADOR' => '#1565c0',
-    'PENDIENTE_RESULTADOS' => '#ef6c00',
-    'CERRADO' => '#2e7d32',
-][$estado_protocolo] ?? '#455a64';
 
 include "views/header.php";
 include "views/menu.php";
@@ -180,8 +172,6 @@ include "views/menu.php";
   padding: 6px;
   box-sizing: border-box;
 }
-.estado-badge { display:inline-block; padding:6px 12px; border-radius:999px; color:#fff; font-weight:bold; font-size:13px; }
-.mensaje-estado { margin:10px 15px 0 15px; padding:12px; border-radius:6px; border:1px solid #ffe69c; background:#fff3cd; color:#664d03; }
 </style>
 
 <div id="main-content" class="main-content">
@@ -201,17 +191,10 @@ include "views/menu.php";
         <!-- Barra herramientas -->
         <div id="barra-herramientas">
              <div style="display: inline-block;">
-                <?php if (!$protocolo_bloqueado): ?>
                 <button type="button" onclick="document.getElementById('form_protocolo').submit()" 
                         style="padding: 8px 15px; background-color:rgb(85, 88, 86); color: white; border: none; min-width: 120px;">
                     💾 Guardar
                 </button>
-                <?php else: ?>
-                <button type="button" disabled
-                        style="padding: 8px 15px; background-color:#9e9e9e; color: white; border: none; min-width: 120px; cursor:not-allowed;">
-                    🔒 Guardar bloqueado
-                </button>
-                <?php endif; ?>
             </div>
 
             <?php if ($protocolo): ?>
@@ -233,13 +216,6 @@ include "views/menu.php";
             
 
         </div>
-
-        <?php if ($protocolo_bloqueado): ?>
-            <div class="mensaje-estado">
-                Este protocolo está en estado <strong><?= htmlspecialchars($estado_protocolo) ?></strong>.
-                Ya no se permite modificar datos generales, muestras ni análisis. Solo puede consultarse y continuar con resultados.
-            </div>
-        <?php endif; ?>
 
         <!-- Tabs -->
         <div class="tabs">
@@ -283,25 +259,13 @@ include "views/menu.php";
 
                                 <?php if ($puedeGestionarRecibos): ?>
                                     <button type="button" id="btnVerRecibos">💵 Recibos</button>
-                                    <?php if (!$protocolo_bloqueado && empty($protocolo['correlativo'] ?? '')): ?>
                                     <button type="button" id="btnGenerarCorrelativo">⚙️ Generar correlativo</button>
-                                <?php else: ?>
-                                    <button type="button" disabled style="background-color:#ccc; color:#666; cursor:not-allowed;">⚙️ Generar correlativo</button>
-                                <?php endif; ?>
                                 <?php endif; ?>
                             </div>
 
                             <small id="resumen_recibos" style="display:block; margin-top:6px; color:#666;">
                                 Sin recibos registrados
                             </small>
-                        </div>
-                        <div class="campo">
-                            <label>Estado del protocolo:</label>
-                            <div>
-                                <span class="estado-badge" style="background: <?= htmlspecialchars($estado_badge_color) ?>;">
-                                    <?= htmlspecialchars($estado_protocolo) ?>
-                                </span>
-                            </div>
                         </div>
                           <!-- reciboss fin-->
                         <div class="campo">
@@ -311,8 +275,8 @@ include "views/menu.php";
                                 <div style="display: flex; gap: 10px; align-items: center;">
                                     <input type="hidden" name="id_cliente" id="id_cliente" value="<?= $protocolo['id_cliente'] ?? '' ?>">
                                     <input type="text" id="nombre_cliente" value="<?= $protocolo['nombre_cliente'] ?? '' ?>" readonly 
-                                        style="flex: 1; padding: 5px; min-width: 200px; <?= $protocolo_bloqueado ? 'background:#f5f5f5;' : '' ?>">
-                                    <?php if (!$protocolo && !$protocolo_bloqueado): ?>
+                                        style="flex: 1; padding: 5px; min-width: 200px;">
+                                    <?php if (!$protocolo): ?>
                                         <button type="button" onclick="abrirModalCliente()" 
                                                 style="padding: 5px 5px; white-space: nowrap;">🔍</button>
                                     <?php else: ?>
@@ -331,18 +295,14 @@ include "views/menu.php";
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="hidden" name="id_finca" id="id_finca" value="<?= $protocolo['id_finca'] ?? '' ?>">
                                 <input type="text" id="nombre_finca" value="<?= $protocolo['nombre_finca'] ?? '' ?>" readonly 
-                                    style="flex: 1; padding: 5px; min-width: 200px; <?= $protocolo_bloqueado ? 'background:#f5f5f5;' : '' ?>">
-                                <?php if (!$protocolo_bloqueado): ?>
-                                    <button type="button" style="padding: 5px 5px; white-space: nowrap;" onclick="abrirModalFinca()">🔍</button>
-                                <?php else: ?>
-                                    <button type="button" disabled style="padding: 5px 5px; white-space: nowrap; background-color: #ccc;">🔍</button>
-                                <?php endif; ?>
+                                    style="flex: 1; padding: 5px; min-width: 200px;">
+                                <button type="button" style="padding: 5px 5px; white-space: nowrap;" onclick="abrirModalFinca()">🔍</button>
                             </div>
                         </div>
                         <div class="campo">
                             <!-- Tipo de Protocolo -->
                             <label>Tipo de Protocolo:</label>
-                            <select name="id_tipo_protocolo" id="select_tipo_protocolo" required <?= $protocolo_bloqueado ? "disabled" : "" ?>>
+                            <select name="id_tipo_protocolo" id="select_tipo_protocolo" required>
                                 <option value="">-- Seleccione --</option>
                                 <?php foreach ($tipos as $tipo): ?>
                                     <option value="<?= $tipo['id_tipo_protocolo'] ?>" <?= (isset($protocolo['id_tipo_protocolo']) && $protocolo['id_tipo_protocolo'] == $tipo['id_tipo_protocolo']) ? 'selected' : '' ?>>
@@ -353,47 +313,47 @@ include "views/menu.php";
                         </div>
                         <div class="campo">
                                 <label>Fecha:</label>
-                                <input type="date" name="fecha" value="<?= $protocolo['fecha'] ?? '' ?>" required <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="date" name="fecha" value="<?= $protocolo['fecha'] ?? '' ?>" required>
                         </div>
                         <div class="campo">
                                 <label>Tipo de Material Remitido:</label>
-                                <input type="text" name="tipo_material" value="<?= htmlspecialchars($protocolo['tipo_material'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="tipo_material" value="<?= htmlspecialchars($protocolo['tipo_material'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>M.V. que remite:</label>
-                                <input type="text" name="mv_remite" value="<?= htmlspecialchars($protocolo['mv_remite'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="mv_remite" value="<?= htmlspecialchars($protocolo['mv_remite'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>Correo Electrónico:</label>
-                                <input type="email" name="correo" value="<?= htmlspecialchars($protocolo['correo'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="email" name="correo" value="<?= htmlspecialchars($protocolo['correo'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>Departamento:</label>
-                                <input type="text" name="departamento" value="<?= htmlspecialchars($protocolo['departamento'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="departamento" value="<?= htmlspecialchars($protocolo['departamento'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>Municipio:</label>
-                                <input type="text" name="municipio" value="<?= htmlspecialchars($protocolo['municipio'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="municipio" value="<?= htmlspecialchars($protocolo['municipio'] ?? '') ?>">
                         </div>                        
                         <div class="campo">
                                 <label>Procedencia:</label>
-                                <input type="text" name="procedencia" value="<?= htmlspecialchars($protocolo['procedencia'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="procedencia" value="<?= htmlspecialchars($protocolo['procedencia'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>Prueba Solicitada (Titulación/Evaluación):</label>
-                                <input type="text" name="prueba_solicitada" value="<?= htmlspecialchars($protocolo['prueba_solicitada'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="prueba_solicitada" value="<?= htmlspecialchars($protocolo['prueba_solicitada'] ?? '') ?>">
                         </div>
                         <div class="campo">
                                 <label>Material Solicitado:</label>
-                                <input type="text" name="material_solicitado" value="<?= htmlspecialchars($protocolo['material_solicitado'] ?? '') ?>" <?= $protocolo_bloqueado ? "readonly" : "" ?>>
+                                <input type="text" name="material_solicitado" value="<?= htmlspecialchars($protocolo['material_solicitado'] ?? '') ?>">
                         </div>
                         <div class="campo  campo-completo">
                                 <label>Observaciones:</label>
-                                <textarea name="observaciones" <?= $protocolo_bloqueado ? "readonly" : "" ?>><?= htmlspecialchars($protocolo['observaciones'] ?? '') ?></textarea>
+                                <textarea name="observaciones"><?= htmlspecialchars($protocolo['observaciones'] ?? '') ?></textarea>
                         </div>
                         <div class="campo">
                                 <label>Estado de la Muestra:</label>
-                                <select name="estado_muestra" <?= $protocolo_bloqueado ? "disabled" : "" ?>>
+                                <select name="estado_muestra">
                                     <option value="buen" <?= ($protocolo['estado_muestra'] ?? '') === 'buen' ? 'selected' : '' ?>>Buen estado</option>
                                     <option value="mal" <?= ($protocolo['estado_muestra'] ?? '') === 'mal' ? 'selected' : '' ?>>Mal estado</option>
                                 </select>
@@ -402,16 +362,16 @@ include "views/menu.php";
                                 <label>Entrega de Resultados:</label>
                                
                                 <label>Personal</label>
-                                    <input type="checkbox" name="entrega_personal" value="1" <?= $protocolo_bloqueado ? "disabled" : "" ?> <?= (!empty($protocolo['entrega_personal'])) ? 'checked' : '' ?>> 
+                                    <input type="checkbox" name="entrega_personal" value="1" <?= (!empty($protocolo['entrega_personal'])) ? 'checked' : '' ?>> 
                                 <label>Correo Electrónico</label>
-                                    <input type="checkbox" name="entrega_correo" value="1" <?= $protocolo_bloqueado ? "disabled" : "" ?> <?= (!empty($protocolo['entrega_correo'])) ? 'checked' : '' ?>> 
+                                    <input type="checkbox" name="entrega_correo" value="1" <?= (!empty($protocolo['entrega_correo'])) ? 'checked' : '' ?>> 
                                 
                         </div>
                         <div class="campo campo-completo">
                                 <!-- Firma -->
                                 <label>Firma del Cliente:</label><br>
-                                <canvas id="canvas" width="400" height="150" style="border:1px solid #000; <?= $protocolo_bloqueado ? "pointer-events:none; background:#f5f5f5;" : "" ?>"></canvas><br>
-                                <?php if (!$protocolo_bloqueado): ?><button type="button" onclick="limpiarFirma()">🧹 Limpiar Firma</button><?php endif; ?>
+                                <canvas id="canvas" width="400" height="150" style="border:1px solid #000;"></canvas><br>
+                                <button type="button" onclick="limpiarFirma()">🧹 Limpiar Firma</button>
                                 <input type="hidden" name="firma_imagen" id="firma_imagen">
                         </div>
                             
@@ -493,25 +453,6 @@ include "views/menu.php";
 
 
 <script>
-
-    const PROTOCOLO_ESTADO = <?= json_encode($estado_protocolo) ?>;
-    const PROTOCOLO_BLOQUEADO = <?= $protocolo_bloqueado ? 'true' : 'false' ?>;
-
-    function aplicarBloqueoEstructura() {
-        if (!PROTOCOLO_BLOQUEADO) return;
-
-        const tabMuestras = document.getElementById('tab_muestras');
-        if (tabMuestras) {
-            tabMuestras.querySelectorAll('button, input, select, textarea').forEach(el => {
-                if (el.name === 'id_protocolo') return;
-                if (el.tagName === 'BUTTON' || el.tagName === 'SELECT') {
-                    el.disabled = true;
-                } else {
-                    el.readOnly = true;
-                }
-            });
-        }
-    }
 
     const panel = document.getElementById('panel-lista');
 const btn = document.getElementById('togglePanelBtn');
@@ -784,7 +725,6 @@ function seleccionarFinca(id, nombre) {
 
 // Si en la URL viene ?tab=algo, activar ese tab al cargar
 document.addEventListener('DOMContentLoaded', function() {
-    aplicarBloqueoEstructura();
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     if (tab) {
