@@ -8,6 +8,21 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol_nombre'] !== 'admi
     exit();
 }
 */
+$rol = strtolower(trim($_SESSION['usuario']['rol_nombre'] ?? ''));
+$id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
+$esCliente = ($rol === 'cliente');
+
+$id_cliente = $_POST['id_cliente'] ?? null;
+
+if ($esCliente) {
+    if (!$id_cliente) {
+        die("No tiene permiso para crear clientes.");
+    }
+
+    if ((int)$id_cliente !== (int)$id_cliente_sesion) {
+        die("No tiene permiso para modificar este cliente.");
+    }
+}
 $nombre = $_POST['nombre'];
 $nit = $_POST['nit'] ?? null;
 $telefono = $_POST['telefono'] ?? null;
@@ -17,7 +32,7 @@ $id_usuario = $_SESSION['usuario']['id_usuario'];
 $fecha_actual = date('Y-m-d H:i:s');
 
 // Detectar si es nuevo o actualización
-$is_update = isset($_POST['id_cliente']) && is_numeric($_POST['id_cliente']);
+$is_update = !empty($_POST['id_cliente']) && is_numeric($_POST['id_cliente']);
 
 try {
     if ($is_update) {
@@ -61,8 +76,8 @@ try {
     }
 
     // Redirigir nuevamente a gestión
-    header("Location: ../gestion_clientes.php");
-    exit();
+    header("Location: ../gestion_clientes.php?id=" . $id_cliente . "&msg=cliente_guardado");
+exit();
 
 } catch (PDOException $e) {
     echo "<h3>⚠️ Error al guardar cliente:</h3>";

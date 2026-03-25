@@ -87,6 +87,27 @@ include "views/menu.php";
                 <?php endif; ?>
             <?php endif; ?>
         </div>
+        
+        <?php if (isset($_GET['msg'])): ?>
+            <div class="alerta alerta-exito">
+                <?php
+                switch ($_GET['msg']) {
+                    case 'cliente_guardado':
+                        echo "✅ Cliente guardado correctamente.";
+                        break;
+                    case 'cliente_eliminado':
+                        echo "🗑️ Cliente eliminado correctamente.";
+                        break;
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alerta alerta-error">
+                ❌ <?= htmlspecialchars($_GET['error']) ?>
+            </div>
+        <?php endif; ?>
 
         <div id="contenido-detalle">
             <h3>
@@ -357,6 +378,25 @@ cargarClientes();
 .sin-resultados {
     padding: 12px;
     color: #666;
+}
+
+.alerta {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.alerta-exito {
+    background-color: #e6f4ea;
+    border: 1px solid #b7e1cd;
+    color: #1e7e34;
+}
+
+.alerta-error {
+    background-color: #fdecea;
+    border: 1px solid #f5c6cb;
+    color: #a71d2a;
 }
 </style>
 
