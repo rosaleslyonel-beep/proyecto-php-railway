@@ -19,8 +19,8 @@ try {
     // Solo insertar si hay nuevos
     if (!empty($analisis_ids)) {
         $stmt_insert = $conexion->prepare("
-            INSERT INTO muestra_analisis (id_muestra, id_analisis, precio_unitario, created_by, created_date)
-            SELECT ?, id_analisis, precio, ?, NOW()
+            INSERT INTO muestra_analisis (id_muestra, id_analisis, precio_unitario, created_by, created_date,cantidad)
+            SELECT ?, id_analisis, precio, ?, NOW(),1
             FROM analisis_laboratorio
             WHERE id_analisis = ?
         ");
