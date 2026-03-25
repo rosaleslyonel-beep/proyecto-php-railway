@@ -9,7 +9,7 @@ $offset = ($pagina - 1) * $limite;
 $rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
 $id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
 if ($busqueda === '') {
-    if ($rol =='cliente' ){
+    if ($rol ==='cliente' ){
          
          $sql = "SELECT id_cliente, nombre 
             FROM clientes 
