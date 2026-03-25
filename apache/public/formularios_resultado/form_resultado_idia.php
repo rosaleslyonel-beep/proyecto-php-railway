@@ -108,6 +108,7 @@ if ($id_muestra && $id_analisis) {
     <form method="POST" action="guardar_resultado_idia.php" onsubmit="prepararEnvio()">
         <input type="hidden" name="id_muestra" value="<?= htmlspecialchars($id_muestra) ?>">
         <input type="hidden" name="id_analisis" value="<?= htmlspecialchars($id_analisis) ?>">
+        <input type="hidden" name="id_protocolo" value="<?= htmlspecialchars($id_protocolo) ?>">
         <input type="hidden" name="placas" id="placas_data">
         <label>Observaciones:</label><br>
         <textarea name="observaciones" rows="3" cols="50"><?= htmlspecialchars($datos_guardados['observaciones'] ?? '') ?></textarea><br><br>
