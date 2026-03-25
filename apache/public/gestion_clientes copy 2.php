@@ -14,15 +14,13 @@ $id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
 $esCliente = ($rol === 'cliente');
 
 $id_cliente = $_GET['id'] ?? null;
-$search = $_GET['search'] ?? '';
 $cliente = null;
 
 /*
 |--------------------------------------------------------------------------
-| Control de acceso y auto-redirect inteligente:
+| Control de acceso:
 | - Si es cliente, solo puede abrir su propio cliente.
-| - Si no viene id, se redirige automáticamente a su cliente asignado.
-| - Si intenta abrir otro id, se redirige a su cliente asignado.
+| - Si no viene id, se carga automáticamente su cliente asignado.
 |--------------------------------------------------------------------------
 */
 if ($esCliente) {
@@ -30,14 +28,7 @@ if ($esCliente) {
         die("No se encontró un cliente asociado a la sesión.");
     }
 
-    if (empty($id_cliente) || (int)$id_cliente !== (int)$id_cliente_sesion) {
-        $url = "gestion_clientes.php?id=" . (int)$id_cliente_sesion;
-        if ($search !== '') {
-            $url .= "&search=" . urlencode($search);
-        }
-        header("Location: $url");
-        exit();
-    }
+    $id_cliente = $id_cliente_sesion;
 }
 
 if ($id_cliente) {
@@ -102,7 +93,6 @@ include "views/menu.php";
                 <?php
                 switch ($_GET['msg']) {
                     case 'cliente_guardado':
-                    case 'guardado':
                         echo "✅ Cliente guardado correctamente.";
                         break;
                     case 'cliente_eliminado':
