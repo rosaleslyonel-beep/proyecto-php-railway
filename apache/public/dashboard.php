@@ -11,7 +11,7 @@ if (!isset($_SESSION["usuario"])) {
 $usuario = $_SESSION['usuario'];
 $rolNombre = strtolower(trim($usuario['rol_nombre'] ?? ''));
 $idClienteSesion = $usuario['id_cliente'] ?? null;
-$idRol = $usuario['rol'] ?? null;
+$idRol = $usuario['id_rol'] ?? null;
 
 $fechaDesde = trim($_GET['fecha_desde'] ?? '');
 $fechaHasta = trim($_GET['fecha_hasta'] ?? '');
@@ -316,15 +316,16 @@ include "views/menu.php";
 #main-content.dashboard-shell {
     display: block !important;
     width: 100%;
-    max-width: 1500px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 20px;
     box-sizing: border-box;
 }
 
 .dashboard-shell {
     background: #f5f7fb;
     min-height: calc(100vh - 70px);
+    overflow-x: hidden;
 }
 
 .page-head {
@@ -332,13 +333,13 @@ include "views/menu.php";
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
 }
 
 .page-head h1 {
     margin: 0 0 6px;
-    font-size: 32px;
+    font-size: 28px;
     color: #17324d;
 }
 
@@ -358,7 +359,7 @@ include "views/menu.php";
     background: #ffffff;
     border: 1px solid #d8e0ea;
     color: #0e5f52;
-    padding: 10px 14px;
+    padding: 9px 13px;
     border-radius: 999px;
     font-weight: 600;
     transition: all .15s ease;
@@ -373,11 +374,11 @@ include "views/menu.php";
 .filter-bar {
     background: #ffffff;
     border: 1px solid #e5eaf0;
-    border-radius: 18px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 14px;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
+    gap: 12px;
     align-items: end;
     box-shadow: 0 8px 24px rgba(22, 42, 66, 0.06);
     margin-bottom: 18px;
@@ -390,7 +391,7 @@ include "views/menu.php";
 }
 
 .filter-field label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     color: #42566d;
 }
@@ -401,7 +402,7 @@ include "views/menu.php";
     border: 1px solid #d2dbe6;
     border-radius: 12px;
     padding: 0 12px;
-    font-size: 14px;
+    font-size: 13px;
     background: #fbfdff;
 }
 
@@ -438,14 +439,14 @@ include "views/menu.php";
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 16px;
 }
 
 .summary-card {
     background: #fff;
-    border-radius: 16px;
-    padding: 14px 16px;
+    border-radius: 14px;
+    padding: 11px 13px;
     border: 1px solid #e5eaf0;
     box-shadow: 0 6px 18px rgba(22, 42, 66, 0.045);
 }
@@ -453,20 +454,20 @@ include "views/menu.php";
 .summary-card span {
     display: block;
     color: #66788f;
-    font-size: 12px;
+    font-size: 10px;
     margin-bottom: 4px;
     font-weight: 700;
 }
 
 .summary-card strong {
     display: block;
-    font-size: 24px;
+    font-size: 16px;
     color: #17324d;
     line-height: 1.1;
 }
 
 .summary-card .summary-text {
-    font-size: 15px;
+    font-size: 12px;
     line-height: 1.25;
 }
 
@@ -477,7 +478,7 @@ include "views/menu.php";
 
 .sections-grid {
     display: grid;
-    gap: 18px;
+    gap: 14px;
     align-items: start;
 }
 
@@ -492,25 +493,26 @@ include "views/menu.php";
 .section-panel {
     background: #ffffff;
     border: 1px solid #e5eaf0;
-    border-radius: 22px;
-    padding: 18px;
+    border-radius: 18px;
+    padding: 14px;
     box-shadow: 0 10px 28px rgba(22, 42, 66, 0.06);
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
 }
 
 .section-panel__head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
 .section-panel__head h2 {
     margin: 0 0 4px;
     color: #17324d;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .section-panel__head p {
@@ -522,10 +524,12 @@ include "views/menu.php";
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
-    max-height: 68vh;
+    gap: 10px;
+    max-height: min(62vh, 760px);
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 4px;
+    overscroll-behavior: contain;
 }
 
 .cards-grid::-webkit-scrollbar {
@@ -547,8 +551,8 @@ include "views/menu.php";
     color: inherit;
     border: 1px solid #e7edf3;
     background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-    border-radius: 16px;
-    padding: 13px;
+    border-radius: 14px;
+    padding: 11px;
     transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
@@ -563,16 +567,16 @@ include "views/menu.php";
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 10px;
+    padding: 5px 9px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
 }
 
@@ -596,13 +600,13 @@ include "views/menu.php";
 .protocol-card__meta-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 12px;
+    gap: 8px 10px;
 }
 
 .protocol-card__meta-grid div {
     background: #f7fafc;
-    border-radius: 10px;
-    padding: 8px 10px;
+    border-radius: 9px;
+    padding: 7px 9px;
 }
 
 .protocol-card__meta-grid .full {
@@ -623,13 +627,13 @@ include "views/menu.php";
 }
 
 .protocol-card__footer {
-    margin-top: 10px;
+    margin-top: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #0a6c5c;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .empty-state {
@@ -642,8 +646,11 @@ include "views/menu.php";
 }
 
 @media (max-width: 1200px) {
-    .sections-grid--two,
     .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sections-grid--two {
         grid-template-columns: 1fr;
     }
 
@@ -655,6 +662,30 @@ include "views/menu.php";
 }
 
 @media (max-width: 900px) {
+    #main-content.dashboard-shell {
+        padding: 16px;
+    }
+
+    .page-head {
+        align-items: flex-start;
+    }
+
+    .page-head h1 {
+        font-size: 24px;
+    }
+
+    .quick-ranges {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .quick-ranges a {
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
     .filter-bar {
         grid-template-columns: 1fr 1fr;
     }
@@ -662,7 +693,15 @@ include "views/menu.php";
 
 @media (max-width: 640px) {
     #main-content.dashboard-shell {
-        padding: 16px;
+        padding: 12px;
+    }
+
+    .page-head {
+        margin-bottom: 14px;
+    }
+
+    .page-head p {
+        font-size: 14px;
     }
 
     .filter-bar,
@@ -673,6 +712,10 @@ include "views/menu.php";
         grid-template-columns: 1fr;
     }
 
+    .filter-bar {
+        padding: 12px;
+    }
+
     .filter-actions {
         justify-content: stretch;
         flex-direction: column;
@@ -681,6 +724,28 @@ include "views/menu.php";
     .btn-primary,
     .btn-secondary {
         width: 100%;
+    }
+
+    .section-panel {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .section-panel__head h2 {
+        font-size: 16px;
+    }
+
+    .protocol-card {
+        padding: 10px;
+    }
+
+    .protocol-card__top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .protocol-card__title {
+        font-size: 15px;
     }
 
     .protocol-card__meta-grid {
