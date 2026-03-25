@@ -31,7 +31,7 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
         </thead>
         <tbody>
             <?php
-            $stmt = $conexion->prepare("SELECT * FROM muestras WHERE id_protocolo = ?");
+            $stmt = $conexion->prepare("SELECT * FROM muestras WHERE id_protocolo = ? order by id_muestra asc");
             $stmt->execute([$id_protocolo]);
             while ($m = $stmt->fetch()) {
                 echo "<tr data-id-muestra='{$m['id_muestra']}' onclick='seleccionarMuestra(".json_encode($m).")'>";
