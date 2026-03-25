@@ -29,6 +29,16 @@ if ($busqueda === '') {
 
 
 } else {
+     if ($rol ==='cliente' ){
+         
+         $sql = "SELECT id_cliente, nombre 
+            FROM clientes 
+            WHERE  CAST(id_cliente AS TEXT) = :busqueda 
+            ORDER BY id_cliente ASC 
+            LIMIT :limite OFFSET :offset";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindValue(':busqueda', $id_cliente_sesion, PDO::PARAM_STR);
+    }else{
     $sql = "SELECT id_cliente, nombre 
             FROM clientes 
             WHERE nombre ILIKE :busqueda OR CAST(id_cliente AS TEXT) ILIKE :busqueda 
@@ -36,6 +46,7 @@ if ($busqueda === '') {
             LIMIT :limite OFFSET :offset";
     $stmt = $conexion->prepare($sql);
     $stmt->bindValue(':busqueda', "%$busqueda%", PDO::PARAM_STR);
+    }
 }
 
 $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
