@@ -438,35 +438,36 @@ include "views/menu.php";
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .summary-card {
     background: #fff;
-    border-radius: 18px;
-    padding: 18px 20px;
+    border-radius: 16px;
+    padding: 14px 16px;
     border: 1px solid #e5eaf0;
-    box-shadow: 0 8px 24px rgba(22, 42, 66, 0.05);
+    box-shadow: 0 6px 18px rgba(22, 42, 66, 0.045);
 }
 
 .summary-card span {
     display: block;
     color: #66788f;
-    font-size: 13px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    margin-bottom: 4px;
     font-weight: 700;
 }
 
 .summary-card strong {
     display: block;
-    font-size: 30px;
+    font-size: 24px;
     color: #17324d;
+    line-height: 1.1;
 }
 
 .summary-card .summary-text {
-    font-size: 18px;
-    line-height: 1.3;
+    font-size: 15px;
+    line-height: 1.25;
 }
 
 .summary-card--amber { border-left: 6px solid #d19a00; }
@@ -477,6 +478,7 @@ include "views/menu.php";
 .sections-grid {
     display: grid;
     gap: 18px;
+    align-items: start;
 }
 
 .sections-grid--two {
@@ -493,6 +495,9 @@ include "views/menu.php";
     border-radius: 22px;
     padding: 18px;
     box-shadow: 0 10px 28px rgba(22, 42, 66, 0.06);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .section-panel__head {
@@ -517,7 +522,24 @@ include "views/menu.php";
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
+    max-height: 68vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.cards-grid::-webkit-scrollbar {
+    width: 10px;
+}
+
+.cards-grid::-webkit-scrollbar-thumb {
+    background: #c9d4df;
+    border-radius: 999px;
+}
+
+.cards-grid::-webkit-scrollbar-track {
+    background: #eef3f8;
+    border-radius: 999px;
 }
 
 .protocol-card {
@@ -525,8 +547,8 @@ include "views/menu.php";
     color: inherit;
     border: 1px solid #e7edf3;
     background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-    border-radius: 18px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 13px;
     transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
@@ -540,8 +562,8 @@ include "views/menu.php";
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .badge {
@@ -565,22 +587,22 @@ include "views/menu.php";
 }
 
 .protocol-card__title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 800;
     color: #17324d;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 .protocol-card__meta-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px 14px;
+    gap: 10px 12px;
 }
 
 .protocol-card__meta-grid div {
     background: #f7fafc;
-    border-radius: 12px;
-    padding: 10px 12px;
+    border-radius: 10px;
+    padding: 8px 10px;
 }
 
 .protocol-card__meta-grid .full {
@@ -590,23 +612,24 @@ include "views/menu.php";
 .protocol-card__meta-grid span {
     display: block;
     color: #738398;
-    font-size: 12px;
-    margin-bottom: 5px;
+    font-size: 11px;
+    margin-bottom: 4px;
     font-weight: 700;
 }
 
 .protocol-card__meta-grid strong {
     color: #21384f;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .protocol-card__footer {
-    margin-top: 14px;
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #0a6c5c;
     font-weight: 800;
+    font-size: 14px;
 }
 
 .empty-state {
@@ -622,6 +645,12 @@ include "views/menu.php";
     .sections-grid--two,
     .summary-grid {
         grid-template-columns: 1fr;
+    }
+
+    .cards-grid {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
 }
 
