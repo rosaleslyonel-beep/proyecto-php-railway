@@ -27,64 +27,49 @@ $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 $observaciones = $_POST['observaciones'] ?? '';
 $datos = [];
 
-
-// =====================
-// 📎 MANEJO DE ARCHIVO
-// =====================
-$archivo_nombre = null;
-
-if (!empty($_FILES['archivo']['name'])) {
-
-   $directorio = __DIR__ . "/uploads/resultados/";
-
-if (!is_dir($directorio)) {
-    if (!mkdir($directorio, 0777, true)) {
-        die("No se pudo crear el directorio: " . $directorio);
+// Mantener archivo anterior si existe
+if ($resultado) {
+    $datos_prev = json_decode($resultado['datos_json'] ?? '{}', true);
+    if (!empty($datos_prev['archivo'])) {
+        $datos['archivo'] = $datos_prev['archivo'];
     }
 }
 
-if (!is_writable($directorio)) {
-    die("El directorio no tiene permisos de escritura: " . $directorio);
-}
+// Subir nuevo archivo si viene uno
+if (!empty($_FILES['archivo']['name'])) {
+    if ($_FILES['archivo']['error'] === UPLOAD_ERR_INI_SIZE) {
+        die("El archivo excede el tamaño máximo permitido por el servidor.");
+    }
 
-if (!isset($_FILES['archivo'])) {
-    die("No llegó el archivo en \$_FILES.");
-}
+    if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+        die("Error al subir archivo. Código: " . $_FILES['archivo']['error']);
+    }
 
-if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
-    die("Error de carga PHP: " . $_FILES['archivo']['error']);
-}
+    $directorio = __DIR__ . "/uploads/resultados/";
 
-$nombre_original = $_FILES["archivo"]["name"];
-$nombre_limpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombre_original);
-$archivo_nombre = time() . "_" . $nombre_limpio;
-$ruta = $directorio . $archivo_nombre;
-
-if (move_uploaded_file($_FILES["archivo"]["tmp_name"], $ruta)) {
-    echo "Archivo guardado correctamente en: " . $ruta;
-    exit;
-} else {
-    echo "<pre>";
-    print_r($_FILES['archivo']);
-    echo "</pre>";
-    die("No se pudo mover el archivo a: " . $ruta);
-}
-    $datos['archivo'] = $archivo_nombre;
-} else {
-    // Mantener archivo anterior si existe
-    if ($resultado) {
-        $datos_prev = json_decode($resultado['datos_json'], true);
-        if (!empty($datos_prev['archivo'])) {
-            $datos['archivo'] = $datos_prev['archivo'];
+    if (!is_dir($directorio)) {
+        if (!mkdir($directorio, 0777, true)) {
+            die("No se pudo crear el directorio de destino.");
         }
     }
+
+    if (!is_writable($directorio)) {
+        die("El directorio no tiene permisos de escritura.");
+    }
+
+    $nombre_original = $_FILES["archivo"]["name"];
+    $nombre_limpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombre_original);
+    $archivo_nombre = time() . "_" . $nombre_limpio;
+    $ruta = $directorio . $archivo_nombre;
+
+    if (move_uploaded_file($_FILES["archivo"]["tmp_name"], $ruta)) {
+        $datos['archivo'] = $archivo_nombre;
+    } else {
+        die("No se pudo mover el archivo al destino final.");
+    }
 }
 
-
-// =====================
-// GUARDAR
-// =====================
-
+// Guardar en BD
 if ($resultado) {
     $stmt = $conexion->prepare("
         UPDATE resultados_analisis
@@ -117,6 +102,5 @@ if ($resultado) {
     ]);
 }
 
-// Redirigir
 header("Location: gestion_protocolos.php?id=$id_protocolo&tab=tab_resultados");
 exit;
