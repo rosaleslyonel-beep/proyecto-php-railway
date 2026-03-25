@@ -89,7 +89,7 @@ function cargarClientes(reset = false) {
                     const li = document.createElement('li');
                     li.className = "cliente-item" + (c.id_cliente === activo ? " activo" : "");
                     li.innerHTML = `<a href="gestion_clientes.php?id=${c.id_cliente}&search=${encodeURIComponent(terminoBusqueda)}">
-                                        <strong>${c.id_cliente}</strong> - ${c.nombre}
+                                        <strong>ID: ${c.id_cliente}</strong> </br>Nombre: ${c.nombre}
                                     </a>`;
                     lista.appendChild(li);
                 });
