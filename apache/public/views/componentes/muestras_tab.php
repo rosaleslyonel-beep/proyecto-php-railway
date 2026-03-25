@@ -55,13 +55,9 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
     <button type="button" onclick="nuevaMuestra()">➕ Nuevo</button>
     <button type="button" onclick="guardarMuestra()">💾 Guardar</button>
   <!--   <button type="button" onclick="refrescarMuestras()">🔄 Refrescar</button>-->
- <!--     <button type="button" id="btnEliminar" onclick="eliminarMuestra()" disabled>🗑 Eliminar</button>-->
-    <button type="button"
-            class="btn-eliminar-muestra"
-            data-id="<?= $m['id_muestra'] ?>"
-            data-protocolo="<?= $id_protocolo ?>">
-        🗑 Eliminar
-    </button>
+      <button type="button" id="btnEliminar" onclick="eliminarMuestra()" disabled>🗑 Eliminar</button>
+ <!--     <button type="button" id="btnEliminarMuestraSeleccionada" disabled>🗑 Eliminar</button>-->
+    
 </div>
 <div id="contenedor-formulario-muestras" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
 <!-- Formulario -->
@@ -296,26 +292,47 @@ $tipo_protocolo_actual = $protocolo['id_tipo_protocolo'] ;
         document.getElementById("cuerpo_analisis_muestra").appendChild(fila);
     }
     function cargarAnalisisDeMuestra(idMuestra) {
-    fetch("controllers/obtener_analisis_muestra.php?id_muestra=" + idMuestra)
-        .then(response => response.json())
-        .then(analisis => {
-        const tabla = document.getElementById("tabla_analisis_muestra");
-        tabla.innerHTML = '<thead><tr><th>Nombres</th><th>Precio</th><th>Quitar</th></tr></thead><tbody id="cuerpo_analisis_muestra"></tbody>';
+        console.log('Cargando análisis de muestra:', idMuestra);
 
-        analisis.forEach(a => {
-            const fila = document.createElement("tr");
-            fila.id = `analisis-item-${a.id_analisis}`;
-            fila.innerHTML = `
-            <td>${a.nombre_estudio}</td>
-            <td>Q ${parseFloat(a.precio).toFixed(2)}</td>
-            <td><button type="button" onclick="this.closest('tr').remove()">❌</button></td>
-            <input type="hidden" name="analisis_ids[]" value="${a.id_analisis}">
-            `;
-            document.getElementById("cuerpo_analisis_muestra").appendChild(fila);
-            
-        });
-        });
-    }
+        fetch("controllers/obtener_analisis_muestra.php?id_muestra=" + encodeURIComponent(idMuestra))
+            .then(response => response.text())
+            .then(raw => {
+                console.log('Respuesta raw:', raw);
+
+                let analisis;
+                try {
+                    analisis = JSON.parse(raw);
+                } catch (e) {
+                    console.error('La respuesta no es JSON válido');
+                    alert('No se pudieron cargar los análisis de la muestra.');
+                    return;
+                }
+
+                const tabla = document.getElementById("tabla_analisis_muestra");
+                tabla.innerHTML = `
+                    <thead>
+                        <tr><th>Nombres</th><th>Precio</th><th>Quitar</th></tr>
+                    </thead>
+                    <tbody id="cuerpo_analisis_muestra"></tbody>
+                `;
+
+                    analisis.forEach(a => {
+                        const fila = document.createElement("tr");
+                        fila.id = `analisis-item-${a.id_analisis}`;
+                        fila.innerHTML = `
+                            <td>${a.nombre_estudio}</td>
+                            <td>Q ${parseFloat(a.precio).toFixed(2)}</td>
+                            <td><button type="button" onclick="this.closest('tr').remove()">❌</button></td>
+                            <input type="hidden" name="analisis_ids[]" value="${a.id_analisis}">
+                        `;
+                        document.getElementById("cuerpo_analisis_muestra").appendChild(fila);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error cargando análisis:', error);
+                    alert('Ocurrió un error al cargar los análisis.');
+                });
+        }
     function eliminarFilaAnalisis(id) {
         const fila = document.getElementById(`analisis-item-${id}`);
         if (fila) {
