@@ -6,12 +6,27 @@ $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $limite = 50;
 $offset = ($pagina - 1) * $limite;
 
+$rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
+$id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
 if ($busqueda === '') {
-    $sql = "SELECT id_cliente, nombre 
+    if ($rol =='cliente' ){
+         
+         $sql = "SELECT id_cliente, nombre 
             FROM clientes 
+            WHERE  CAST(id_cliente AS TEXT) = :busqueda 
             ORDER BY id_cliente ASC 
             LIMIT :limite OFFSET :offset";
     $stmt = $conexion->prepare($sql);
+    $stmt->bindValue(':busqueda', $id_cliente_sesion, PDO::PARAM_STR);
+    }else{
+        $sql = "SELECT id_cliente, nombre 
+                FROM clientes 
+                ORDER BY id_cliente ASC 
+                LIMIT :limite OFFSET :offset";
+        $stmt = $conexion->prepare($sql);
+    }
+
+
 } else {
     $sql = "SELECT id_cliente, nombre 
             FROM clientes 
