@@ -151,9 +151,10 @@ $stmt->execute();
         $id_muestra = $conexion->lastInsertId();
     }
 
-    if (!empty($_POST['analisis_ids']) && is_array($_POST['analisis_ids'])) {
-        $stmtDel = $conexion->prepare("DELETE FROM muestra_analisis WHERE id_muestra = ?");
+    $stmtDel = $conexion->prepare("DELETE FROM muestra_analisis WHERE id_muestra = ?");
         $stmtDel->execute([$id_muestra]);
+    if (!empty($_POST['analisis_ids']) && is_array($_POST['analisis_ids'])) {
+        
 
         
          $stmt_insert = $conexion->prepare("
