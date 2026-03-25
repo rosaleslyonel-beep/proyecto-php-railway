@@ -28,7 +28,7 @@ if ($rol === 'cliente') {
     $sql .= " and p.id_cliente = :id_cliente ";
 }
  
-           $sql .= " ORDER BY fecha DESC 
+           $sql .= "  ORDER BY id_protocolo desc,fecha DESC 
             LIMIT :limite OFFSET :offset";
     $stmt = $conexion->prepare($sql);
     if ($rol === 'cliente') {
@@ -52,7 +52,7 @@ if ($rol === 'cliente') {
 
 } 
             
-           $sql .= "  ORDER BY fecha DESC 
+           $sql .= "  ORDER BY id_protocolo desc,fecha DESC 
             LIMIT :limite OFFSET :offset";
     $stmt = $conexion->prepare($sql);
     $stmt->bindValue(':busqueda', "%$busqueda%", PDO::PARAM_STR);
