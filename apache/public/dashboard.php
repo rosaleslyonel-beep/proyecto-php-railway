@@ -11,7 +11,7 @@ if (!isset($_SESSION["usuario"])) {
 $usuario = $_SESSION['usuario'];
 $rolNombre = strtolower(trim($usuario['rol_nombre'] ?? ''));
 $idClienteSesion = $usuario['id_cliente'] ?? null;
-$idRol = $usuario['id_rol'] ?? null;
+$idRol = $usuario['rol'] ?? null;
 
 $fechaDesde = trim($_GET['fecha_desde'] ?? '');
 $fechaHasta = trim($_GET['fecha_hasta'] ?? '');
