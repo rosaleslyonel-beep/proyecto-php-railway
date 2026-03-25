@@ -1,13 +1,14 @@
 <?php
 require_once "../config/database.php";
+$id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
+$rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
 
 $busqueda = trim($_GET['busqueda'] ?? '');
 $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $limite = 50;
 $offset = ($pagina - 1) * $limite;
 
-$rol = strtolower(trim($_SESSION['usuario']['rol_nombre']  ?? ''));
-$id_cliente_sesion = $_SESSION['usuario']['id_cliente'] ?? null;
+
 if ($busqueda === '') {
     if ($rol ==='cliente' ){
          
