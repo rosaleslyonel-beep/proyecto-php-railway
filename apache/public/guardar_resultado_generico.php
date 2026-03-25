@@ -43,9 +43,13 @@ if (!empty($_FILES['archivo']['name'])) {
 
     $archivo_nombre = time() . "_" . basename($_FILES["archivo"]["name"]);
     $ruta = $directorio . $archivo_nombre;
-
-    move_uploaded_file($_FILES["archivo"]["tmp_name"], $ruta);
-
+    if (move_uploaded_file($_FILES["archivo"]["tmp_name"], $ruta)) {
+        echo "Guardado en: " . realpath($ruta);
+        exit; 
+    } else {
+        echo "No se pudo guardar.";
+        exit;
+    }
     $datos['archivo'] = $archivo_nombre;
 } else {
     // Mantener archivo anterior si existe
