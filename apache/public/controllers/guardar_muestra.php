@@ -10,6 +10,7 @@ if (!isset($_SESSION['usuario'])) {
 
 $id_muestra   = $_POST['id_muestra'] ?? null;
 $id_protocolo = $_POST['id_protocolo'] ?? null;
+$usuario_id = $_SESSION['usuario']['id_usuario'] ?? null;
 
 if (!$id_protocolo || !is_numeric($id_protocolo)) {
     echo "Error: Falta ID de protocolo.";
