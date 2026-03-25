@@ -154,16 +154,18 @@ $stmt->execute();
         $stmtDel = $conexion->prepare("DELETE FROM muestra_analisis WHERE id_muestra = ?");
         $stmtDel->execute([$id_muestra]);
 
-        $stmtIns = $conexion->prepare("
-            INSERT INTO muestra_analisis (id_muestra, id_analisis)
-            VALUES (?, ?)
+        
+         $stmt_insert = $conexion->prepare("
+            INSERT INTO muestra_analisis (id_muestra, id_analisis, precio_unitario, created_by, created_date,cantidad)
+            SELECT ?, id_analisis, precio, ?, NOW(),1
+            FROM analisis_laboratorio
+            WHERE id_analisis = ?
         ");
 
-        foreach ($_POST['analisis_ids'] as $id_analisis) {
-            if (is_numeric($id_analisis)) {
-                $stmtIns->execute([$id_muestra, $id_analisis]);
-            }
+        foreach ($_POST['analisis_ids']  as $id_analisis) {
+            $stmt_insert->execute([$id_muestra, $usuario_id, $id_analisis]);
         }
+
     }
 
     header("Location: ../gestion_protocolos.php?id={$id_protocolo}&tab=tab_muestras");
