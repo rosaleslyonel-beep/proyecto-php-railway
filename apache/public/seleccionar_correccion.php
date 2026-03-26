@@ -21,24 +21,55 @@ if (!$protocolo) {
     die("No se encontró el protocolo.");
 }
 
-$stmt = $conexion->prepare("
-    SELECT
-        m.id_muestra,
-        m.tipo_muestra,
-        a.id_analisis,
-        a.nombre_estudio,
-        ra.id_resultado,
-        COALESCE(ma.estado_resultado, 'ACTIVO') AS estado_resultado
-    FROM muestras m
-    JOIN muestra_analisis ma ON ma.id_muestra = m.id_muestra
-    JOIN analisis_laboratorio a ON a.id_analisis = ma.id_analisis
-    JOIN resultados_analisis ra ON ra.id_muestra = ma.id_muestra AND ra.id_analisis = ma.id_analisis
-    WHERE m.id_protocolo = ?
-      AND COALESCE(ma.estado_resultado, 'ACTIVO') = 'ACTIVO'
-    ORDER BY m.id_muestra, a.nombre_estudio
+$stmtEmisiones = $conexion->prepare("
+    SELECT id_emision, fecha_emision, tipo_emision, resultados_incluidos_json
+    FROM protocolo_emisiones_resultados
+    WHERE id_protocolo = ?
+    ORDER BY fecha_emision DESC, id_emision DESC
 ");
-$stmt->execute([$id_protocolo]);
-$filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmtEmisiones->execute([$id_protocolo]);
+$emisiones = $stmtEmisiones->fetchAll(PDO::FETCH_ASSOC);
+
+$resultadoIdsEmitidos = [];
+foreach ($emisiones as $emision) {
+    $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
+    if (is_array($ids)) {
+        foreach ($ids as $id) {
+            $id = (int)$id;
+            if ($id > 0) {
+                $resultadoIdsEmitidos[$id] = true;
+            }
+        }
+    }
+}
+$resultadoIdsEmitidos = array_keys($resultadoIdsEmitidos);
+
+$filas = [];
+if (!empty($resultadoIdsEmitidos)) {
+    $placeholders = implode(',', array_fill(0, count($resultadoIdsEmitidos), '?'));
+    $params = array_merge([$id_protocolo], $resultadoIdsEmitidos);
+
+    $stmt = $conexion->prepare("
+        SELECT
+            m.id_muestra,
+            m.tipo_muestra,
+            a.id_analisis,
+            a.nombre_estudio,
+            ra.id_resultado,
+            ra.created_date AS resultado_creado,
+            COALESCE(ma.estado_resultado, 'ACTIVO') AS estado_resultado
+        FROM muestras m
+        JOIN muestra_analisis ma ON ma.id_muestra = m.id_muestra
+        JOIN analisis_laboratorio a ON a.id_analisis = ma.id_analisis
+        JOIN resultados_analisis ra ON ra.id_muestra = ma.id_muestra AND ra.id_analisis = ma.id_analisis
+        WHERE m.id_protocolo = ?
+          AND ra.id_resultado IN ($placeholders)
+          AND COALESCE(ma.estado_resultado, 'ACTIVO') = 'ACTIVO'
+        ORDER BY m.id_muestra, a.nombre_estudio
+    ");
+    $stmt->execute($params);
+    $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 $agrupado = [];
 foreach ($filas as $fila) {
@@ -61,6 +92,8 @@ foreach ($filas as $fila) {
         .bloque h3 { margin:0; padding:12px 14px; background:#f1f3f5; }
         .item { display:flex; gap:12px; padding:12px 14px; border-top:1px solid #eee; align-items:flex-start; }
         .help { background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:12px; border-radius:6px; margin-bottom:16px; }
+        .mini { color:#6c757d; font-size: 12px; }
+        .emit-list { background:#f8f9fa; border:1px solid #dee2e6; padding:12px; border-radius:6px; margin-bottom:16px; }
     </style>
 </head>
 <body>
@@ -72,12 +105,31 @@ foreach ($filas as $fila) {
     <h2>Crear corrección</h2>
     <p><strong>Protocolo:</strong> <?= htmlspecialchars($protocolo['correlativo'] ?: ('ID ' . $protocolo['id_protocolo'])) ?></p>
 
+    <?php if (empty($emisiones)): ?>
+        <div class="help">
+            No hay informes emitidos para este protocolo. La corrección se habilita únicamente después de generar resultados.
+        </div>
+    <?php else: ?>
+        <div class="emit-list">
+            <strong>Emisiones registradas:</strong>
+            <ul style="margin:8px 0 0 18px;">
+                <?php foreach ($emisiones as $emision): ?>
+                    <li>
+                        <?= htmlspecialchars($emision['tipo_emision'] ?: 'EMISION') ?>
+                        · <?= !empty($emision['fecha_emision']) ? htmlspecialchars(date('d/m/Y H:i', strtotime($emision['fecha_emision']))) : '—' ?>
+                        · <a href="vista_previa_resultados.php?id_protocolo=<?= (int)$id_protocolo ?>&id_emision=<?= (int)$emision['id_emision'] ?>" target="_blank">Ver emisión</a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
     <div class="help">
-        Seleccione únicamente los análisis ya ingresados que deban enviarse a un nuevo protocolo de corrección.
+        Solo se muestran análisis que ya fueron incluidos en al menos una emisión de resultados y que siguen activos en el protocolo actual.
     </div>
 
     <?php if (!$filas): ?>
-        <p>No hay análisis con resultado disponibles para corrección.</p>
+        <p>No hay análisis emitidos disponibles para corrección.</p>
     <?php else: ?>
         <form method="post" action="crear_correccion.php">
             <input type="hidden" name="id_protocolo" value="<?= (int)$id_protocolo ?>">
@@ -89,7 +141,10 @@ foreach ($filas as $fila) {
                             <input type="checkbox" name="selecciones[]" value="<?= (int)$a['id_muestra'] ?>|<?= (int)$a['id_analisis'] ?>">
                             <div>
                                 <strong><?= htmlspecialchars($a['nombre_estudio']) ?></strong><br>
-                                <small>ID análisis: <?= (int)$a['id_analisis'] ?> · Resultado registrado: <?= (int)$a['id_resultado'] ?></small>
+                                <small>ID análisis: <?= (int)$a['id_analisis'] ?> · Resultado emitido: <?= (int)$a['id_resultado'] ?></small>
+                                <?php if (!empty($a['resultado_creado'])): ?>
+                                    <div class="mini">Resultado ingresado: <?= htmlspecialchars(date('d/m/Y H:i', strtotime($a['resultado_creado']))) ?></div>
+                                <?php endif; ?>
                             </div>
                         </label>
                     <?php endforeach; ?>

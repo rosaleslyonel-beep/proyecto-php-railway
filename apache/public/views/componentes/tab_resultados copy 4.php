@@ -42,7 +42,6 @@ $stmtEmisiones = $conexion->prepare("
 ");
 $stmtEmisiones->execute([$id_protocolo]);
 $emisiones = $stmtEmisiones->fetchAll(PDO::FETCH_ASSOC);
-$totalEmisiones = count($emisiones);
 
 // Protocolos hijos / relacionados
 $stmtHijos = $conexion->prepare("
@@ -114,16 +113,10 @@ if (!empty($protocolo['id_protocolo_padre'])) {
             </a>
         <?php endif; ?>
 
-        <?php if ($totalEmisiones > 0): ?>
-            <a href="seleccionar_correccion.php?id_protocolo=<?= $id_protocolo ?>"
-               style="display:inline-block; background:#fd7e14; color:#fff; text-decoration:none; padding:10px 14px; border-radius:6px; font-weight:bold;">
-                ♻️ Crear corrección
-            </a>
-        <?php else: ?>
-            <div style="background:#fff3cd; border:1px solid #ffe69c; color:#664d03; padding:10px 12px; border-radius:6px;">
-                La corrección se habilita después de generar al menos un informe de resultados.
-            </div>
-        <?php endif; ?>
+        <a href="seleccionar_correccion.php?id_protocolo=<?= $id_protocolo ?>"
+           style="display:inline-block; background:#fd7e14; color:#fff; text-decoration:none; padding:10px 14px; border-radius:6px; font-weight:bold;">
+            ♻️ Crear corrección
+        </a>
     <?php elseif ($totalAnalisisProtocolo > 0): ?>
         <div style="background:#e7f1ff; border:1px solid #b6d4fe; color:#084298; padding:10px 12px; border-radius:6px;">
             La vista previa y la generación de resultados se habilitan cuando exista al menos un resultado ingresado.
