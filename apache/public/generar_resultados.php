@@ -107,7 +107,7 @@ try {
 
         $idRaiz = !empty($protocolo['id_protocolo_raiz']) ? (int)$protocolo['id_protocolo_raiz'] : (int)$id_protocolo;
 
-        $stmt = $conexion->prepare("
+        $$stmt = $conexion->prepare("
             INSERT INTO protocolos (
                 fecha, telefono, correo, direccion, protocolo_no, observaciones, estado_muestra,
                 entrega_personal, entrega_correo, firma_cliente, firma_recibe, datos_especificos, firma_imagen,
@@ -126,50 +126,51 @@ try {
                 :id_protocolo_padre, :id_protocolo_raiz, 'SEGUIMIENTO', :correlativo_base, :no_derivacion
             )
         ");
-        $stmt->execute([
-    ':fecha' => $protocolo['fecha'],
-    ':telefono' => $protocolo['telefono'],
-    ':correo' => $protocolo['correo'],
-    ':direccion' => $protocolo['direccion'],
-    ':protocolo_no' => $protocolo['protocolo_no'],
-    ':observaciones' => $protocolo['observaciones'],
-    ':estado_muestra' => $protocolo['estado_muestra'],
 
-    ':entrega_personal' => !empty($protocolo['entrega_personal']),
-    ':entrega_correo' => !empty($protocolo['entrega_correo']),
+        $stmt->bindValue(':fecha', $protocolo['fecha']);
+        $stmt->bindValue(':telefono', $protocolo['telefono']);
+        $stmt->bindValue(':correo', $protocolo['correo']);
+        $stmt->bindValue(':direccion', $protocolo['direccion']);
+        $stmt->bindValue(':protocolo_no', $protocolo['protocolo_no']);
+        $stmt->bindValue(':observaciones', $protocolo['observaciones']);
+        $stmt->bindValue(':estado_muestra', $protocolo['estado_muestra']);
 
-    ':firma_cliente' => $protocolo['firma_cliente'],
-    ':firma_recibe' => $protocolo['firma_recibe'],
-    ':datos_especificos' => $protocolo['datos_especificos'],
-    ':firma_imagen' => $protocolo['firma_imagen'],
+        $stmt->bindValue(':entrega_personal', !empty($protocolo['entrega_personal']), PDO::PARAM_BOOL);
+        $stmt->bindValue(':entrega_correo', !empty($protocolo['entrega_correo']), PDO::PARAM_BOOL);
 
-    ':id_cliente' => $protocolo['id_cliente'],
-    ':id_finca' => $protocolo['id_finca'],
-    ':created_by' => $id_usuario,
-    ':id_tipo_protocolo' => $protocolo['id_tipo_protocolo'],
-    ':tipo_material' => $protocolo['tipo_material'],
-    ':mv_remite' => $protocolo['mv_remite'],
-    ':departamento' => $protocolo['departamento'],
-    ':municipio' => $protocolo['municipio'],
-    ':coordenada_vertical' => $protocolo['coordenada_vertical'],
-    ':coordenada_horizontal' => $protocolo['coordenada_horizontal'],
-    ':procedencia' => $protocolo['procedencia'],
-    ':prueba_solicitada' => $protocolo['prueba_solicitada'],
-    ':material_solicitado' => $protocolo['material_solicitado'],
-    ':correlativo' => $nuevoCorrelativo,
+        $stmt->bindValue(':firma_cliente', $protocolo['firma_cliente']);
+        $stmt->bindValue(':firma_recibe', $protocolo['firma_recibe']);
+        $stmt->bindValue(':datos_especificos', $protocolo['datos_especificos']);
+        $stmt->bindValue(':firma_imagen', $protocolo['firma_imagen']);
 
-    // 🔥 AQUÍ ESTÁ EL FIX
-    ':boleta_generada' => !empty($protocolo['boleta_generada']),
-    ':boleta_fecha' => $protocolo['boleta_fecha'] ?: null,
-    ':pago_confirmado' => !empty($protocolo['pago_confirmado']),
-    ':correlativo_forzado' => !empty($protocolo['correlativo_forzado']),
-    ':correlativo_motivo' => $protocolo['correlativo_motivo'],
+        $stmt->bindValue(':id_cliente', $protocolo['id_cliente'], PDO::PARAM_INT);
+        $stmt->bindValue(':id_finca', $protocolo['id_finca'] ?: null, $protocolo['id_finca'] ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':created_by', $id_usuario, PDO::PARAM_INT);
+        $stmt->bindValue(':id_tipo_protocolo', $protocolo['id_tipo_protocolo'] ?: null, $protocolo['id_tipo_protocolo'] ? PDO::PARAM_INT : PDO::PARAM_NULL);
 
-    ':id_protocolo_padre' => $id_protocolo,
-    ':id_protocolo_raiz' => $idRaiz,
-    ':correlativo_base' => $correlativoBase,
-    ':no_derivacion' => $siguienteNo,
-]);
+        $stmt->bindValue(':tipo_material', $protocolo['tipo_material']);
+        $stmt->bindValue(':mv_remite', $protocolo['mv_remite']);
+        $stmt->bindValue(':departamento', $protocolo['departamento']);
+        $stmt->bindValue(':municipio', $protocolo['municipio']);
+        $stmt->bindValue(':coordenada_vertical', $protocolo['coordenada_vertical']);
+        $stmt->bindValue(':coordenada_horizontal', $protocolo['coordenada_horizontal']);
+        $stmt->bindValue(':procedencia', $protocolo['procedencia']);
+        $stmt->bindValue(':prueba_solicitada', $protocolo['prueba_solicitada']);
+        $stmt->bindValue(':material_solicitado', $protocolo['material_solicitado']);
+        $stmt->bindValue(':correlativo', $nuevoCorrelativo);
+
+        $stmt->bindValue(':boleta_generada', !empty($protocolo['boleta_generada']), PDO::PARAM_BOOL);
+        $stmt->bindValue(':boleta_fecha', $protocolo['boleta_fecha'] ?: null, $protocolo['boleta_fecha'] ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':pago_confirmado', !empty($protocolo['pago_confirmado']), PDO::PARAM_BOOL);
+        $stmt->bindValue(':correlativo_forzado', !empty($protocolo['correlativo_forzado']), PDO::PARAM_BOOL);
+        $stmt->bindValue(':correlativo_motivo', $protocolo['correlativo_motivo']);
+
+        $stmt->bindValue(':id_protocolo_padre', $id_protocolo, PDO::PARAM_INT);
+        $stmt->bindValue(':id_protocolo_raiz', $idRaiz, PDO::PARAM_INT);
+        $stmt->bindValue(':correlativo_base', $correlativoBase);
+        $stmt->bindValue(':no_derivacion', $siguienteNo, PDO::PARAM_INT);
+
+        $stmt->execute();
         $idProtocoloDestino = (int)$conexion->lastInsertId();
 
         $mapMuestras = [];
