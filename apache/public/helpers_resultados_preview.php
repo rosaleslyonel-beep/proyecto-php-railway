@@ -210,15 +210,28 @@ if (!function_exists('rp_render_resultado')) {
             $html .= '</div>';
 
             $placas = is_array($datos) ? $datos : [];
-            if (!empty($placas)) {
-                $html .= '<div class="subtitulo-resultado">Placas registradas</div>';
-                $html .= '<div class="placas-resumen">';
-                foreach ($placas as $indice => $placa) {
-                    $totalCeldas = is_array($placa) ? count($placa) : 0;
-                    $html .= '<div class="placa-card"><strong>Placa ' . rp_h($indice) . '</strong><br>Total celdas capturadas: ' . rp_h($totalCeldas) . '</div>';
-                }
-                $html .= '</div>';
-            }
+$totalHI = 0;
+$cantidadHI = 0;
+
+foreach ($placas as $placa) {
+    if (!is_array($placa)) continue;
+
+    foreach ($placa as $valor) {
+        $valor = trim((string)$valor);
+        if ($valor !== '' && is_numeric($valor)) {
+            $totalHI += (float)$valor;
+            $cantidadHI++;
+        }
+    }
+}
+
+$promedioHI = $cantidadHI > 0 ? $totalHI / $cantidadHI : 0;
+
+$html .= '<div class="resultado-grid">';
+$html .= '<div><strong>Total:</strong> ' . number_format($totalHI, 2) . '</div>';
+$html .= '<div><strong>Cantidad de valores:</strong> ' . $cantidadHI . '</div>';
+$html .= '<div><strong>Promedio:</strong> ' . number_format($promedioHI, 2) . '</div>';
+$html .= '</div>';
 
             $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';
             $html .= '</div>';

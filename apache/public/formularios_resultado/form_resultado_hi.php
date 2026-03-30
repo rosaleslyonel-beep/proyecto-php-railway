@@ -7,6 +7,47 @@ $resultado = $stmt->fetch();
  
 $placas = json_decode($resultado['datos_json'] ?? '{}', true);
 
+ 
+function calcularResumenHI($placas) {
+    $total = 0;
+    $cantidad = 0;
+
+    if (!is_array($placas)) {
+        return [
+            'total' => 0,
+            'cantidad' => 0,
+            'promedio' => 0
+        ];
+    }
+
+    foreach ($placas as $placa) {
+        if (!is_array($placa)) continue;
+
+        foreach ($placa as $valor) {
+            $valor = trim((string)$valor);
+
+            if ($valor === '') {
+                continue;
+            }
+
+            // aceptar enteros o decimales
+            if (is_numeric($valor)) {
+                $numero = (float)$valor;
+                $total += $numero;
+                $cantidad++;
+            }
+        }
+    }
+
+    return [
+        'total' => $total,
+        'cantidad' => $cantidad,
+        'promedio' => $cantidad > 0 ? $total / $cantidad : 0
+    ];
+}
+
+$resumen_hi = calcularResumenHI($placas);
+
 // Obtener id_protocolo desde la muestra si no se tiene
 $stmt = $conexion->prepare("SELECT id_protocolo FROM muestras WHERE id_muestra = ?");
 $stmt->execute([$id_muestra]);
@@ -95,7 +136,15 @@ $id_protocolo = $stmt->fetchColumn();
         </div>  
    </div>             
     <button type="button" onclick="agregarPlaca(<?php echo $noplaca; ?>)">+ Agregar Placa</button>
-            </div>            
+            </div>   
+            <div class="campo campo-completo">
+    <h4>Resumen de valores</h4>
+    <div id="resumen-hi" style="display:flex; gap:20px; flex-wrap:wrap; background:#f5f5f5; padding:12px; border-radius:6px;">
+        <div><strong>Total:</strong> <span id="hi-total"><?= number_format($resumen_hi['total'], 2) ?></span></div>
+        <div><strong>Cantidad de valores:</strong> <span id="hi-cantidad"><?= (int)$resumen_hi['cantidad'] ?></span></div>
+        <div><strong>Promedio:</strong> <span id="hi-promedio"><?= number_format($resumen_hi['promedio'], 2) ?></span></div>
+    </div>
+</div>         
              <div class="campo campo-completo">
                 <label>Observaciones:</label><br>
                 <textarea name="observaciones" rows="4" cols="50"><?= htmlspecialchars($resultado['observaciones'] ?? '') ?></textarea><br><br>
@@ -199,4 +248,35 @@ document.addEventListener("DOMContentLoaded", aplicarNavegacionVertical);
             });
         });
     });
+
+    function recalcularResumenHI() {
+    const inputs = document.querySelectorAll('.tabla-placa input');
+    let total = 0;
+    let cantidad = 0;
+
+    inputs.forEach(input => {
+        const valor = input.value.trim();
+
+        if (valor !== '' && !isNaN(valor)) {
+            total += parseFloat(valor);
+            cantidad++;
+        }
+    });
+
+    const promedio = cantidad > 0 ? (total / cantidad) : 0;
+
+    document.getElementById('hi-total').textContent = total.toFixed(2);
+    document.getElementById('hi-cantidad').textContent = cantidad;
+    document.getElementById('hi-promedio').textContent = promedio.toFixed(2);
+}
+
+document.addEventListener('input', function(e) {
+    if (e.target.matches('.tabla-placa input')) {
+        recalcularResumenHI();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    recalcularResumenHI();
+});
 </script>
