@@ -76,6 +76,7 @@ include "views/menu.php";
                  <?php if ($id_analisis): ?>
                     <li><a href="#" onclick="mostrarTab('tab_roles')" class="tablink">🔐 Asignar Roles</a></li>
                 <?php endif; ?>
+                <li><a href="#" onclick="mostrarTab('tab_reactivos')" class="tablink">🧪 Reactivos</a></li>
             </ul>
         </div>
         <form id="form_analisis" action="controllers/analisis_guardar.php" method="POST" autocomplete="off">
@@ -152,6 +153,7 @@ include "views/menu.php";
                         <button type="button" onclick="agregarRol()">➕ Agregar</button>
                     </div>
                 </div>
+                <?php include 'views/componentes/tab_reactivos.php'; ?>
             </div>
         </form>
     </div>
@@ -238,6 +240,8 @@ include "views/menu.php";
 </style>
 
 <script>
+
+    const ID_ANALISIS = <?= $id_analisis ?? 0 ?>;
 function agregarRol() {
     const select = document.getElementById("nuevo_rol");
     const id_rol = select.value;
