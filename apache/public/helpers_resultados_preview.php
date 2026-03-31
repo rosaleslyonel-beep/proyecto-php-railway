@@ -289,6 +289,90 @@ $html .= '</div>';
             $html .= '</div>';
             return $html;
         }			 		 
+
+        if ($tipo === 'prueba_rapida_placa') {
+            $filas = $datos['filas'] ?? [];
+            if (!is_array($filas)) {
+                $filas = [];
+            }
+
+            $otraNombre = trim((string)($datos['otra_nombre'] ?? ''));
+            if ($otraNombre === '') {
+                $otraNombre = 'Otra';
+            }
+
+            $contar = function(array $filas, string $campo, string $valor): int {
+                $total = 0;
+                foreach ($filas as $filaTabla) {
+                    if (($filaTabla[$campo] ?? '') === $valor) {
+                        $total++;
+                    }
+                }
+                return $total;
+            };
+
+            $html .= '<div class="resultado-bloque">';
+            $html .= '<div class="resultado-grid">';
+            $html .= '<div><strong>Fecha:</strong> ' . rp_fmt_fecha($datos['fecha'] ?? '') . '</div>';
+            $html .= '<div><strong>Lote antígeno / antisuero:</strong> ' . rp_h($datos['lote_antigeno_antisuero'] ?? '') . '</div>';
+            $html .= '<div><strong>Responsable:</strong> ' . rp_h($datos['responsable'] ?? '') . '</div>';
+            $html .= '<div><strong>Supervisor:</strong> ' . rp_h($datos['supervisor'] ?? '') . '</div>';
+            $html .= '</div>';
+
+            $html .= '<div class="resultado-grid">';
+            $html .= '<div><strong>MG positivos:</strong> ' . $contar($filas, 'mg', 'positivo') . '</div>';
+            $html .= '<div><strong>MG negativos:</strong> ' . $contar($filas, 'mg', 'negativo') . '</div>';
+            $html .= '<div><strong>MS positivos:</strong> ' . $contar($filas, 'ms', 'positivo') . '</div>';
+            $html .= '<div><strong>MS negativos:</strong> ' . $contar($filas, 'ms', 'negativo') . '</div>';
+            $html .= '<div><strong>Salmonella positivos:</strong> ' . $contar($filas, 'salmonella', 'positivo') . '</div>';
+            $html .= '<div><strong>Salmonella negativos:</strong> ' . $contar($filas, 'salmonella', 'negativo') . '</div>';
+            $html .= '<div><strong>' . rp_h($otraNombre) . ' positivos:</strong> ' . $contar($filas, 'otra', 'positivo') . '</div>';
+            $html .= '<div><strong>' . rp_h($otraNombre) . ' negativos:</strong> ' . $contar($filas, 'otra', 'negativo') . '</div>';
+            $html .= '</div>';
+
+            $html .= '<div style="overflow:auto; margin-top:10px;">';
+            $html .= '<table style="width:100%; border-collapse:collapse; min-width:900px;">';
+            $html .= '<thead>';
+            $html .= '<tr>';
+            $html .= '<th colspan="9" style="border:1px solid #999; padding:8px; background:#f3f3f3; text-align:center;">RESULTADOS</th>';
+            $html .= '</tr>';
+            $html .= '<tr>';
+            $html .= '<th style="border:1px solid #999; padding:8px; background:#f3f3f3;"># de suero</th>';
+            $html .= '<th colspan="2" style="border:1px solid #999; padding:8px; background:#f3f3f3;">MG</th>';
+            $html .= '<th colspan="2" style="border:1px solid #999; padding:8px; background:#f3f3f3;">MS</th>';
+            $html .= '<th colspan="2" style="border:1px solid #999; padding:8px; background:#f3f3f3;">Salmonella</th>';
+            $html .= '<th colspan="2" style="border:1px solid #999; padding:8px; background:#f3f3f3;">' . rp_h($otraNombre) . '</th>';
+            $html .= '</tr>';
+            $html .= '<tr>';
+            foreach (['', 'Positivo', 'Negativo', 'Positivo', 'Negativo', 'Positivo', 'Negativo', 'Positivo', 'Negativo'] as $encabezado) {
+                $html .= '<th style="border:1px solid #999; padding:8px; background:#f9f9f9; text-align:center;">' . rp_h($encabezado) . '</th>';
+            }
+            $html .= '</tr>';
+            $html .= '</thead>';
+            $html .= '<tbody>';
+
+            if (!empty($filas)) {
+                ksort($filas);
+                foreach ($filas as $indice => $filaTabla) {
+                    $html .= '<tr>';
+                    $html .= '<td style="border:1px solid #999; padding:8px; text-align:center;">' . rp_h($indice) . '</td>';
+                    foreach (['mg', 'ms', 'salmonella', 'otra'] as $campo) {
+                        $valor = strtolower((string)($filaTabla[$campo] ?? ''));
+                        $html .= '<td style="border:1px solid #999; padding:8px; text-align:center;">' . ($valor === 'positivo' ? 'X' : '') . '</td>';
+                        $html .= '<td style="border:1px solid #999; padding:8px; text-align:center;">' . ($valor === 'negativo' ? 'X' : '') . '</td>';
+                    }
+                    $html .= '</tr>';
+                }
+            } else {
+                $html .= '<tr><td colspan="9" style="border:1px solid #999; padding:8px; text-align:center;">No hay filas registradas.</td></tr>';
+            }
+
+            $html .= '</tbody></table></div>';
+            $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';
+            $html .= '</div>';
+            return $html;
+        }
+
         $archivo = $datos['archivo'] ?? null;
         $html .= '<div class="resultado-bloque">';
         $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';

@@ -92,7 +92,7 @@ function contarResultado($lineas, $campo, $valor) {
 .tabla-wrap{overflow:auto;margin-top:10px}
 table{width:100%;border-collapse:collapse;min-width:980px}
 th,td{border:1px solid #888;padding:6px;text-align:center}
-thead th{background:#f3f3f3}
+thead th{background:#5b5b5b}
 th.vertical{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;min-width:28px;padding:8px 4px}
 td:first-child, th:first-child{font-weight:bold}
 .radio-cell label{display:inline-flex;align-items:center;justify-content:center;min-width:32px}
@@ -173,6 +173,12 @@ window.addEventListener('DOMContentLoaded', actualizarResumen);
                 <label>Supervisor</label>
                 <input type="text" name="supervisor" value="<?= h($datos_guardados['supervisor'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>>
             </div>
+        
+        <div class="campo" style="grid-column:1 / -1;">
+            <label>Observaciones</label>
+            <textarea name="observaciones" rows="4" <?= $soloLectura ? 'readonly' : '' ?>><?= h($datos_guardados['observaciones'] ?? '') ?></textarea>
+        </div>
+
         </div>
 
         <div class="tabla-wrap">

@@ -43,18 +43,20 @@ $datos = [
 
 try {
     if ($id_resultado) {
-        $stmt = $conexion->prepare("UPDATE resultados_analisis SET datos_json = :datos_json, updated_by = :updated_by, updated_date = CURRENT_TIMESTAMP WHERE id_resultado = :id_resultado");
+        $stmt = $conexion->prepare("UPDATE resultados_analisis SET datos_json = :datos_json, observaciones = :observaciones, updated_by = :updated_by, updated_date = CURRENT_TIMESTAMP WHERE id_resultado = :id_resultado");
         $stmt->execute([
             ':datos_json' => json_encode($datos),
+            ':observaciones' => $observaciones,
             ':updated_by' => $id_usuario,
             ':id_resultado' => $id_resultado
         ]);
     } else {
-        $stmt = $conexion->prepare("INSERT INTO resultados_analisis (id_muestra, id_analisis, datos_json, observaciones, created_by, created_date) VALUES (:id_muestra, :id_analisis, :datos_json, '', :created_by, CURRENT_TIMESTAMP)");
+        $stmt = $conexion->prepare("INSERT INTO resultados_analisis (id_muestra, id_analisis, datos_json, observaciones, created_by, created_date) VALUES (:id_muestra, :id_analisis, :datos_json, :observaciones, :created_by, CURRENT_TIMESTAMP)");
         $stmt->execute([
             ':id_muestra' => $id_muestra,
             ':id_analisis' => $id_analisis,
             ':datos_json' => json_encode($datos),
+            ':observaciones' => $observaciones,
             ':created_by' => $id_usuario
         ]);
     }
