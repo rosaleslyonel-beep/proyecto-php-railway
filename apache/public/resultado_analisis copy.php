@@ -14,48 +14,18 @@ $id_analisis = (int) $_GET['id_analisis'];
 
 // Consulta para obtener información del análisis y su tipo de formulario
 $stmt = $conexion->prepare("
-    SELECT a.nombre_estudio, a.tipo_formulario, m.tipo_muestra, m.id_protocolo
+    SELECT a.nombre_estudio, a.tipo_formulario, m.tipo_muestra
     FROM muestra_analisis ma
     JOIN analisis_laboratorio a ON ma.id_analisis = a.id_analisis
     JOIN muestras m ON ma.id_muestra = m.id_muestra
     WHERE ma.id_muestra = ? AND ma.id_analisis = ?
 ");
 $stmt->execute([$id_muestra, $id_analisis]);
-$datos = $stmt->fetch(PDO::FETCH_ASSOC);
+$datos = $stmt->fetch();
 
 if (!$datos) {
     echo "<p>⚠️ No se encontró la muestra o el análisis.</p>";
     exit();
-}
-
-$id_protocolo = (int)$datos['id_protocolo'];
-
-// Verificar si el resultado actual ya fue emitido en alguna emisión del protocolo
-$stmt = $conexion->prepare("
-    SELECT id_resultado
-    FROM resultados_analisis
-    WHERE id_muestra = ? AND id_analisis = ?
-");
-$stmt->execute([$id_muestra, $id_analisis]);
-$id_resultado_actual = $stmt->fetchColumn();
-
-$resultado_emitido = false;
-if ($id_resultado_actual) {
-    $stmt = $conexion->prepare("
-        SELECT resultados_incluidos_json
-        FROM protocolo_emisiones_resultados
-        WHERE id_protocolo = ?
-    ");
-    $stmt->execute([$id_protocolo]);
-    $emisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($emisiones as $emision) {
-        $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
-        if (is_array($ids) && in_array((int)$id_resultado_actual, array_map('intval', $ids), true)) {
-            $resultado_emitido = true;
-            break;
-        }
-    }
 }
 
 $tipo_formulario = $datos['tipo_formulario'] ?? 'generico';
@@ -69,13 +39,6 @@ include "views/menu.php";
 <div id="contenido">
     <h2>Resultado de Análisis: <?= htmlspecialchars($nombre_estudio) ?></h2>
     <p><strong>Muestra:</strong> <?= htmlspecialchars($tipo_muestra) ?> (ID <?= $id_muestra ?>)</p>
-
-    <?php if ($resultado_emitido): ?>
-        <div style="background:#e2e3e5; border:1px solid #c6c7c8; color:#41464b; padding:12px; margin:15px 0; border-radius:6px;">
-            Este resultado ya fue emitido en un informe. Está disponible solo para consulta.
-            Para modificarlo, debe crear una corrección.
-        </div>
-    <?php endif; ?>
 
     <div style="margin-top: 20px;">
         <?php
