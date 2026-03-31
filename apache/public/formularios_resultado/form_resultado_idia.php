@@ -1,6 +1,9 @@
 <?php
 require_once "config/helpers.php";
 require_once "config/database.php";
+
+function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
+
 $id_muestra = $_GET['id_muestra'] ?? null;
 $id_analisis = $_GET['id_analisis'] ?? null;
 $id_protocolo = $_GET['id_protocolo'] ?? null;
@@ -8,118 +11,131 @@ if (!$id_muestra || !$id_analisis) {
     echo "Error: Faltan parámetros.";
     exit;
 }
- 
 
-// Obtener resultado existente
+$stmt = $conexion->prepare("SELECT id_protocolo, cantidad, tipo_muestra FROM muestras WHERE id_muestra = ?");
+$stmt->execute([$id_muestra]);
+$muestra = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$muestra) {
+    echo "Error: No se encontró la muestra.";
+    exit;
+}
+if (!$id_protocolo) {
+    $id_protocolo = $muestra['id_protocolo'];
+}
+$cantidad_muestra = (int)($muestra['cantidad'] ?? 0);
+if ($cantidad_muestra <= 0) $cantidad_muestra = 1;
+
 $datos_guardados = [];
-if ($id_muestra && $id_analisis) {
-    $stmt = $conexion->prepare("SELECT * FROM resultados_analisis WHERE id_muestra = ? AND id_analisis = ?");
-    $stmt->execute([$id_muestra, $id_analisis]);
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($resultado) {
-        $datos_guardados = json_decode($resultado['datos_json'], true);
+$id_resultado_actual = null;
+$stmt = $conexion->prepare("SELECT * FROM resultados_analisis WHERE id_muestra = ? AND id_analisis = ?");
+$stmt->execute([$id_muestra, $id_analisis]);
+$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($resultado) {
+    $id_resultado_actual = $resultado['id_resultado'];
+    $datos_guardados = json_decode($resultado['datos_json'] ?? '{}', true);
+    if (!is_array($datos_guardados)) $datos_guardados = [];
+}
+
+$resultado_emitido = false;
+if ($id_resultado_actual && $id_protocolo) {
+    $stmt = $conexion->prepare("SELECT resultados_incluidos_json FROM protocolo_emisiones_resultados WHERE id_protocolo = ?");
+    $stmt->execute([$id_protocolo]);
+    $emisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($emisiones as $emision) {
+        $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
+        if (is_array($ids) && in_array((int)$id_resultado_actual, array_map('intval', $ids), true)) {
+            $resultado_emitido = true;
+            break;
+        }
     }
 }
-?>
+$soloLectura = $resultado_emitido;
 
+$placas_guardadas = $datos_guardados['placas'] ?? [];
+if (!is_array($placas_guardadas)) $placas_guardadas = [];
+$placas_normalizadas = [];
+for ($i=0; $i<$cantidad_muestra; $i++) {
+    $placas_normalizadas[] = $placas_guardadas[$i] ?? 'negativo';
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Resultado IDIA</title>
-    <style>
-        .placa-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .placa {
-            width: 100px;
-            height: 100px;
-            clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-            background-color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .placa.positivo {
-            background-color: #e57373;
-            color: white;
-        }
-        .placa.negativo {
-            background-color: #81c784;
-            color: white;
-        }
-    </style>
-    <script>
-        function toggleResultado(btn) {
-            if (btn.classList.contains('positivo')) {
-                btn.classList.remove('positivo');
-                btn.classList.add('negativo');
-                btn.dataset.valor = 'negativo';
-                btn.innerText = '−';
-            } else {
-                btn.classList.remove('negativo');
-                btn.classList.add('positivo');
-                btn.dataset.valor = 'positivo';
-                btn.innerText = '+';
-            }
-        }
-
-        function agregarPlaca() {
-            const container = document.getElementById('placas');
-            const index = container.children.length + 1;
-            const div = document.createElement('div');
-            div.className = 'placa negativo';
-            div.dataset.valor = 'negativo';
-            div.innerText = '−';
-            div.onclick = function () { toggleResultado(this); };
-            container.appendChild(div);
-        }
-
-        function regresar() {
-            window.location.href = 'gestion_protocolos.php?tab=tab_resultados&id=' + <?= json_encode($id_protocolo) ?>;
-        }
-
-        function prepararEnvio() {
-            const placas = document.querySelectorAll('.placa');
-            const resultados = Array.from(placas).map(p => p.dataset.valor);
-            document.getElementById('placas_data').value = JSON.stringify(resultados);
-        }
-
-        window.onload = function () {
-            const valores = <?= json_encode($datos_guardados['placas'] ?? []) ?>;
-            const container = document.getElementById('placas');
-            for (let val of valores) {
-                const div = document.createElement('div');
-                div.className = 'placa ' + (val === 'positivo' ? 'positivo' : 'negativo');
-                div.dataset.valor = val;
-                div.innerText = val === 'positivo' ? '+' : '−';
-                div.onclick = function () { toggleResultado(this); };
-                container.appendChild(div);
-            }
-        }
-    </script>
+<meta charset="UTF-8">
+<title>Resultado IDIA</title>
+<style>
+.idia-wrap{font-family:Arial,sans-serif;max-width:1100px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px}
+.idia-top-actions{margin-bottom:15px}.btn-regresar{display:inline-block;text-decoration:none;padding:10px 14px;background:#6c757d;color:#fff;border-radius:6px;font-weight:bold}
+.bloque-lectura{background:#e2e3e5;border:1px solid #c6c7c8;color:#41464b;padding:12px;margin:15px 0;border-radius:6px}
+.encabezado-idia{display:grid;grid-template-columns:1.1fr 1.4fr 1.2fr;border:1px solid #777;margin-bottom:20px}
+.encabezado-idia>div{min-height:120px;border-right:1px solid #777;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px}
+.encabezado-idia>div:last-child{border-right:none}.logo-box{font-size:34px;font-weight:bold;color:#b08a00;line-height:1.1}.titulo-box{font-size:18px;font-weight:bold}.codigo-box{font-size:18px;line-height:1.4;text-align:left!important;justify-content:flex-start!important}
+.form-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:18px}.linea-campo{display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:center;border-bottom:1px solid #999;padding-bottom:6px}.linea-campo label{font-size:17px}.linea-campo input,.linea-campo textarea{width:100%;border:none;outline:none;font-size:16px;padding:4px 0;background:transparent}
+.linea-doble{display:grid;grid-template-columns:200px 1fr 160px 1fr;gap:12px;align-items:center;border-bottom:1px solid #999;padding-bottom:6px}.linea-doble input{width:100%;border:none;outline:none;font-size:16px;padding:4px 0;background:transparent}
+.circulos-wrap{margin-top:18px}.circulos-info{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:12px}.badge-info{display:inline-block;background:#f5f5f5;border:1px solid #ddd;border-radius:999px;padding:8px 12px;font-weight:bold}
+.circulos-grid{display:flex;flex-wrap:wrap;gap:14px}.circulo-item{display:flex;flex-direction:column;align-items:center;gap:8px;width:82px}
+.circulo{width:54px;height:54px;border-radius:50%;border:2px solid #666;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;user-select:none;background:#e9ecef;color:#333}
+.circulo.positivo{background:#e57373;color:#fff;border-color:#c62828}.circulo.negativo{background:#81c784;color:#fff;border-color:#2e7d32}.circulo-item small{color:#555}
+.resumen{margin-top:14px;display:flex;gap:14px;flex-wrap:wrap}.resumen-box{background:#f8f9fa;border:1px solid #ddd;border-radius:8px;padding:10px 12px;min-width:170px}
+.obs-wrap{margin-top:20px}.obs-wrap textarea{width:100%;min-height:120px;border:1px solid #ccc;border-radius:6px;padding:10px;font-size:15px;box-sizing:border-box}
+.acciones-finales{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-guardar{padding:10px 16px;border:none;background:#198754;color:#fff;font-weight:bold;border-radius:6px;cursor:pointer}
+@media (max-width:900px){.encabezado-idia{grid-template-columns:1fr}.encabezado-idia>div{border-right:none;border-bottom:1px solid #777;min-height:80px}.encabezado-idia>div:last-child{border-bottom:none}.linea-campo,.linea-doble{grid-template-columns:1fr}}
+</style>
+<script>
+const soloLectura = <?= $soloLectura ? 'true' : 'false' ?>;
+function toggleResultado(btn){if(soloLectura)return; if(btn.classList.contains('positivo')){btn.classList.remove('positivo');btn.classList.add('negativo');btn.dataset.valor='negativo';btn.innerText='−';}else{btn.classList.remove('negativo');btn.classList.add('positivo');btn.dataset.valor='positivo';btn.innerText='+';}recalcularResumenIDIA();}
+function prepararEnvio(){const placas=document.querySelectorAll('.circulo');const resultados=Array.from(placas).map(p=>p.dataset.valor);document.getElementById('placas_data').value=JSON.stringify(resultados);}
+function recalcularResumenIDIA(){const placas=document.querySelectorAll('.circulo');let positivos=0, negativos=0;placas.forEach(p=>{if(p.dataset.valor==='positivo') positivos++; else negativos++;});document.getElementById('total-positivos').textContent=positivos;document.getElementById('total-negativos').textContent=negativos;}
+function regresar(){window.location.href='gestion_protocolos.php?tab=tab_resultados&id=' + <?= json_encode($id_protocolo) ?>;}
+window.onload=function(){recalcularResumenIDIA();}
+</script>
 </head>
 <body>
-    <h2>Resultado IDIA</h2>
-    <form method="POST" action="guardar_resultado_idia.php" onsubmit="prepararEnvio()">
-        <input type="hidden" name="id_muestra" value="<?= htmlspecialchars($id_muestra) ?>">
-        <input type="hidden" name="id_analisis" value="<?= htmlspecialchars($id_analisis) ?>">
-        <input type="hidden" name="id_protocolo" value="<?= htmlspecialchars($id_protocolo) ?>">
-        <input type="hidden" name="placas" id="placas_data">
-        <label>Observaciones:</label><br>
-        <textarea name="observaciones" rows="3" cols="50"><?= htmlspecialchars($datos_guardados['observaciones'] ?? '') ?></textarea><br><br>
+<div class="idia-wrap">
+<div class="idia-top-actions"><a href="gestion_protocolos.php?id=<?= (int)$id_protocolo ?>&tab=tab_resultados" class="btn-regresar">← Regresar a Resultados</a></div>
+<?php if ($soloLectura): ?><div class="bloque-lectura">Este resultado ya fue emitido. Solo está disponible para consulta. Para modificarlo, debe crear una corrección.</div><?php endif; ?>
 
-        <h4>Placas:</h4>
-        <div id="placas" class="placa-container"></div>
-        <br>
-        <button type="button" onclick="agregarPlaca()">Agregar Placa</button>
-        <br><br>
-        <button type="submit">Guardar</button>
-        <button type="button" onclick="regresar()">Regresar</button>
-    </form>
+<div class="encabezado-idia">
+    <div class="logo-box">LARRSA</div>
+    <div class="titulo-box">INMUNODIFUSIÓN EN AGAR GEL<div style="margin-top:10px;font-size:16px;font-weight:normal;">IDIA</div></div>
+    <div class="codigo-box"><div><strong>Código:</strong> LAR-RE-013</div><div><strong>Versión No.:</strong> 6</div><div><strong>Página</strong> 1 de 1</div></div>
+</div>
+
+<form method="POST" action="guardar_resultado_idia.php" onsubmit="prepararEnvio()">
+<input type="hidden" name="id_resultado" value="<?= htmlspecialchars($id_resultado_actual ?? '') ?>">
+<input type="hidden" name="id_muestra" value="<?= htmlspecialchars($id_muestra) ?>">
+<input type="hidden" name="id_analisis" value="<?= htmlspecialchars($id_analisis) ?>">
+<input type="hidden" name="id_protocolo" value="<?= htmlspecialchars($id_protocolo) ?>">
+<input type="hidden" name="placas" id="placas_data">
+
+<div class="form-grid">
+<div class="linea-campo"><label>No. de Lote del antígeno / Antisuero:</label><input type="text" name="lote_antigeno" value="<?= h($datos_guardados['lote_antigeno'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="linea-campo"><label>Lote de elaboración del Agar:</label><input type="text" name="lote_agar" value="<?= h($datos_guardados['lote_agar'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="linea-campo"><label>Fecha de elaboración:</label><input type="date" name="fecha_elaboracion" value="<?= h($datos_guardados['fecha_elaboracion'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="linea-campo"><label>Procesada por:</label><input type="text" name="procesada_por" value="<?= h($datos_guardados['procesada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="linea-doble"><label>Prueba para:</label><input type="text" name="prueba_para" value="<?= h($datos_guardados['prueba_para'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Placa No:</label><input type="text" name="placa_no" value="<?= h($datos_guardados['placa_no'] ?? $cantidad_muestra) ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="linea-doble"><label>Fecha de Lectura:</label><input type="date" name="fecha_lectura" value="<?= h($datos_guardados['fecha_lectura'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Realizada por:</label><input type="text" name="realizada_por" value="<?= h($datos_guardados['realizada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+</div>
+
+<div class="circulos-wrap">
+<div class="circulos-info"><div class="badge-info">Cantidad de unidades en muestra: <?= (int)$cantidad_muestra ?></div><div class="badge-info">Muestra: <?= h($muestra['tipo_muestra']) ?></div></div>
+<div class="circulos-grid">
+<?php foreach ($placas_normalizadas as $idx => $estado): $estado = ($estado === 'positivo') ? 'positivo' : 'negativo'; $simbolo = ($estado === 'positivo') ? '+' : '−'; ?>
+<div class="circulo-item">
+    <div class="circulo <?= $estado ?>" data-valor="<?= $estado ?>" onclick="toggleResultado(this)"><?= $simbolo ?></div>
+    <small>Muestra <?= $idx + 1 ?></small>
+</div>
+<?php endforeach; ?>
+</div>
+<div class="resumen"><div class="resumen-box"><strong>Total positivos:</strong> <span id="total-positivos">0</span></div><div class="resumen-box"><strong>Total negativos:</strong> <span id="total-negativos">0</span></div></div>
+</div>
+
+<div class="obs-wrap"><label><strong>Observaciones:</strong></label><br><textarea name="observaciones" <?= $soloLectura ? 'readonly' : '' ?>><?= h($datos_guardados['observaciones'] ?? '') ?></textarea></div>
+<div class="acciones-finales">
+<?php if ($soloLectura): ?><div class="bloque-lectura" style="margin:0;">Este resultado ya fue emitido. Para modificarlo, debe crear una corrección.</div><?php else: ?><button type="submit" class="btn-guardar">Guardar</button><?php endif; ?>
+<button type="button" class="btn-regresar" onclick="regresar()">Regresar</button>
+</div>
+</form>
+</div>
 </body>
 </html>

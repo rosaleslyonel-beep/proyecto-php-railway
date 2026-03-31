@@ -20,9 +20,10 @@ $datos = [
     'fecha_elaboracion' => $_POST['fecha_elaboracion'] ?? '',
     'procesada_por' => $_POST['procesada_por'] ?? '',
     'prueba_para' => $_POST['prueba_para'] ?? '',
+    'placa_no' => $_POST['placa_no'] ?? '',
     'fecha_lectura' => $_POST['fecha_lectura'] ?? '',
     'realizada_por' => $_POST['realizada_por'] ?? '',
-    'placas' => $placas
+    'placas' => is_string($placas) ? (json_decode($placas, true) ?: []) : $placas
 ];
 
 $id_usuario = $_SESSION['usuario']['id_usuario'] ?? null;
@@ -32,15 +33,22 @@ if (!$id_muestra || !$id_analisis) {
     exit;
 }
 
+if ($id_resultado) {
+    $stmt = $conexion->prepare("SELECT resultados_incluidos_json FROM protocolo_emisiones_resultados WHERE id_protocolo = ?");
+    $stmt->execute([$id_protocolo]);
+    $emisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($emisiones as $emision) {
+        $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
+        if (is_array($ids) && in_array((int)$id_resultado, array_map('intval', $ids), true)) {
+            header("Location: resultado_analisis.php?id_protocolo=$id_protocolo&id_muestra=$id_muestra&id_analisis=$id_analisis&error=" . urlencode("Este resultado ya fue emitido y no puede modificarse directamente. Debe generar una corrección."));
+            exit;
+        }
+    }
+}
+
 try {
     if ($id_resultado) {
-        $stmt = $conexion->prepare("UPDATE resultados_analisis SET 
-            datos_json = :datos_json,
-            observaciones = :observaciones,
-            updated_by = :updated_by,
-            updated_date = CURRENT_TIMESTAMP
-            WHERE id_resultado = :id_resultado");
-
+        $stmt = $conexion->prepare("UPDATE resultados_analisis SET datos_json = :datos_json, observaciones = :observaciones, updated_by = :updated_by, updated_date = CURRENT_TIMESTAMP WHERE id_resultado = :id_resultado");
         $stmt->execute([
             ':datos_json' => json_encode($datos),
             ':observaciones' => $observaciones,
@@ -48,12 +56,7 @@ try {
             ':id_resultado' => $id_resultado
         ]);
     } else {
-        $stmt = $conexion->prepare("INSERT INTO resultados_analisis (
-            id_muestra, id_analisis, datos_json, observaciones, created_by, created_date
-        ) VALUES (
-            :id_muestra, :id_analisis, :datos_json, :observaciones, :created_by, CURRENT_TIMESTAMP
-        )");
-
+        $stmt = $conexion->prepare("INSERT INTO resultados_analisis (id_muestra, id_analisis, datos_json, observaciones, created_by, created_date) VALUES (:id_muestra, :id_analisis, :datos_json, :observaciones, :created_by, CURRENT_TIMESTAMP)");
         $stmt->execute([
             ':id_muestra' => $id_muestra,
             ':id_analisis' => $id_analisis,
