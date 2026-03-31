@@ -176,7 +176,7 @@ window.addEventListener('DOMContentLoaded', actualizarResumen);
         
         <div class="campo" style="grid-column:1 / -1;">
             <label>Observaciones</label>
-            <textarea name="observaciones" rows="4" <?= $soloLectura ? 'readonly' : '' ?>><?= h($datos_guardados['observaciones'] ?? '') ?></textarea>
+            <textarea name="observaciones" rows="4" <?= $soloLectura ? 'readonly' : '' ?>><?= h($resultado['observaciones'] ?? '') ?></textarea>
         </div>
 
         </div>
