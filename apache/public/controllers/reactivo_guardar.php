@@ -53,4 +53,9 @@ if ($id_reactivo) {
     ]);
 }
 
+
+    header("Location: ../gestion_analisis.php?id={$_POST['id_analisis']}&tab=tab_reactivos&msg=guardado");
+    exit();
+
+
 echo "ok";
