@@ -104,6 +104,8 @@ include "views/menu.php";
                         <option value="IDIA" <?= isset($analisis) && $analisis['tipo_formulario'] === 'IDIA' ? 'selected' : '' ?>>IDIA</option>
                         <option value="generico" <?= isset($analisis) && $analisis['tipo_formulario'] === 'generico' ? 'selected' : '' ?>>Genérico</option>
                         <option value="brucella" <?= isset($analisis) && $analisis['tipo_formulario'] === 'brucella' ? 'selected' : '' ?>>Brucella</option>
+                        <option value="prueba_rapida_placa" <?= isset($analisis) && $analisis['tipo_formulario'] === 'prueba_rapida_placa' ? 'selected' : '' ?>>Prueba Rápida en Placa</option>
+                        
                     </select>
                     </div>
                 </div>
