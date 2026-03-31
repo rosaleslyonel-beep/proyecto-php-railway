@@ -240,6 +240,7 @@ include "views/menu.php";
 </style>
 
 <script>
+    const ID_ANALISIS = <?= $id_analisis ?? 0 ?>;
 function agregarRol() {
     const select = document.getElementById("nuevo_rol");
     const id_rol = select.value;
@@ -289,7 +290,7 @@ function mostrarTab(tabId) {
             link.classList.add('activo');
         }
     });
-    
+
     if (tabId === 'tab_reactivos') {
     cargarReactivos();
 }
