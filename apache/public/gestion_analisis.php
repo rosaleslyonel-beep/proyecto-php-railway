@@ -153,8 +153,9 @@ include "views/menu.php";
                         </select>
                         <button type="button" onclick="agregarRol()">➕ Agregar</button>
                     </div>
+                    <?php include 'views/componentes/tab_reactivos.php'; ?>
                 </div>
-                <?php include 'views/componentes/tab_reactivos.php'; ?>
+                
             </div>
         </form>
     </div>
