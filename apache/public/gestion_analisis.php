@@ -75,8 +75,9 @@ include "views/menu.php";
                 
                  <?php if ($id_analisis): ?>
                     <li><a href="#" onclick="mostrarTab('tab_roles')" class="tablink">🔐 Asignar Roles</a></li>
+                    <li><a href="#" onclick="mostrarTab('tab_reactivos')" class="tablink">🧪 Reactivos</a></li>
                 <?php endif; ?>
-                <li><a href="#" onclick="mostrarTab('tab_reactivos')" class="tablink">🧪 Reactivos</a></li>
+                
             </ul>
         </div>
         <form id="form_analisis" action="controllers/analisis_guardar.php" method="POST" autocomplete="off">
