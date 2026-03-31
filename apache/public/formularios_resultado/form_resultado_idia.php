@@ -95,12 +95,6 @@ window.onload=function(){recalcularResumenIDIA();}
 <div class="idia-top-actions"><a href="gestion_protocolos.php?id=<?= (int)$id_protocolo ?>&tab=tab_resultados" class="btn-regresar">← Regresar a Resultados</a></div>
 <?php if ($soloLectura): ?><div class="bloque-lectura">Este resultado ya fue emitido. Solo está disponible para consulta. Para modificarlo, debe crear una corrección.</div><?php endif; ?>
 
-<div class="encabezado-idia">
-    <div class="logo-box">LARRSA</div>
-    <div class="titulo-box">INMUNODIFUSIÓN EN AGAR GEL<div style="margin-top:10px;font-size:16px;font-weight:normal;">IDIA</div></div>
-    <div class="codigo-box"><div><strong>Código:</strong> LAR-RE-013</div><div><strong>Versión No.:</strong> 6</div><div><strong>Página</strong> 1 de 1</div></div>
-</div>
-
 <form method="POST" action="guardar_resultado_idia.php" onsubmit="prepararEnvio()">
 <input type="hidden" name="id_resultado" value="<?= htmlspecialchars($id_resultado_actual ?? '') ?>">
 <input type="hidden" name="id_muestra" value="<?= htmlspecialchars($id_muestra) ?>">
@@ -109,12 +103,12 @@ window.onload=function(){recalcularResumenIDIA();}
 <input type="hidden" name="placas" id="placas_data">
 
 <div class="form-grid">
-<div class="linea-campo"><label>No. de Lote del antígeno / Antisuero:</label><input type="text" name="lote_antigeno" value="<?= h($datos_guardados['lote_antigeno'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div class="linea-campo"><label>Lote de elaboración del Agar:</label><input type="text" name="lote_agar" value="<?= h($datos_guardados['lote_agar'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div class="linea-campo"><label>Fecha de elaboración:</label><input type="date" name="fecha_elaboracion" value="<?= h($datos_guardados['fecha_elaboracion'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div class="linea-campo"><label>Procesada por:</label><input type="text" name="procesada_por" value="<?= h($datos_guardados['procesada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div class="linea-doble"><label>Prueba para:</label><input type="text" name="prueba_para" value="<?= h($datos_guardados['prueba_para'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Placa No:</label><input type="text" name="placa_no" value="<?= h($datos_guardados['placa_no'] ?? $cantidad_muestra) ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div class="linea-doble"><label>Fecha de Lectura:</label><input type="date" name="fecha_lectura" value="<?= h($datos_guardados['fecha_lectura'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Realizada por:</label><input type="text" name="realizada_por" value="<?= h($datos_guardados['realizada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>No. de Lote del antígeno / Antisuero:</label><input type="text" name="lote_antigeno" value="<?= h($datos_guardados['lote_antigeno'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>Lote de elaboración del Agar:</label><input type="text" name="lote_agar" value="<?= h($datos_guardados['lote_agar'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>Fecha de elaboración:</label><input type="date" name="fecha_elaboracion" value="<?= h($datos_guardados['fecha_elaboracion'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>Procesada por:</label><input type="text" name="procesada_por" value="<?= h($datos_guardados['procesada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>Prueba para:</label><input type="text" name="prueba_para" value="<?= h($datos_guardados['prueba_para'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Placa No:</label><input type="text" name="placa_no" value="<?= h($datos_guardados['placa_no'] ?? $cantidad_muestra) ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div ><label>Fecha de Lectura:</label><input type="date" name="fecha_lectura" value="<?= h($datos_guardados['fecha_lectura'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Realizada por:</label><input type="text" name="realizada_por" value="<?= h($datos_guardados['realizada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
 </div>
 
 <div class="circulos-wrap">
