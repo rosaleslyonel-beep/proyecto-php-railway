@@ -103,12 +103,12 @@ window.onload=function(){recalcularResumenIDIA();}
 <input type="hidden" name="placas" id="placas_data">
 
 <div class="form-grid">
-<div ><label>No. de Lote del antígeno / Antisuero:</label><input type="text" name="lote_antigeno" value="<?= h($datos_guardados['lote_antigeno'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div ><label>Lote de elaboración del Agar:</label><input type="text" name="lote_agar" value="<?= h($datos_guardados['lote_agar'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div ><label>Fecha de elaboración:</label><input type="date" name="fecha_elaboracion" value="<?= h($datos_guardados['fecha_elaboracion'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div ><label>Procesada por:</label><input type="text" name="procesada_por" value="<?= h($datos_guardados['procesada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div ><label>Prueba para:</label><input type="text" name="prueba_para" value="<?= h($datos_guardados['prueba_para'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Placa No:</label><input type="text" name="placa_no" value="<?= h($datos_guardados['placa_no'] ?? $cantidad_muestra) ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
-<div ><label>Fecha de Lectura:</label><input type="date" name="fecha_lectura" value="<?= h($datos_guardados['fecha_lectura'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Realizada por:</label><input type="text" name="realizada_por" value="<?= h($datos_guardados['realizada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>No. de Lote del antígeno / Antisuero:</label><input type="text" name="lote_antigeno" value="<?= h($datos_guardados['lote_antigeno'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>Lote de elaboración del Agar:</label><input type="text" name="lote_agar" value="<?= h($datos_guardados['lote_agar'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>Fecha de elaboración:</label><input type="date" name="fecha_elaboracion" value="<?= h($datos_guardados['fecha_elaboracion'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>Procesada por:</label><input type="text" name="procesada_por" value="<?= h($datos_guardados['procesada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>Prueba para:</label><input type="text" name="prueba_para" value="<?= h($datos_guardados['prueba_para'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Placa No:</label><input type="text" name="placa_no" value="<?= h($datos_guardados['placa_no'] ?? $cantidad_muestra) ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
+<div class="campo"><label>Fecha de Lectura:</label><input type="date" name="fecha_lectura" value="<?= h($datos_guardados['fecha_lectura'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>><label>Realizada por:</label><input type="text" name="realizada_por" value="<?= h($datos_guardados['realizada_por'] ?? '') ?>" <?= $soloLectura ? 'readonly' : '' ?>></div>
 </div>
 
 <div class="circulos-wrap">
