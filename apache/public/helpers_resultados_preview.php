@@ -232,6 +232,7 @@ $html .= '<div><strong>Total:</strong> ' . number_format($totalHI, 2) . '</div>'
 $html .= '<div><strong>Cantidad de valores:</strong> ' . $cantidadHI . '</div>';
 $html .= '<div><strong>Promedio:</strong> ' . number_format($promedioHI, 2) . '</div>';
 $html .= '</div>';
+			 
 
             $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';
             $html .= '</div>';
@@ -265,6 +266,29 @@ $html .= '</div>';
             return $html;
         }
 
+
+		  if ($tipo === 'brucella') {
+            $resultado = strtolower((string)($datos['resultado'] ?? ''));
+            $resultadoTexto = '—';
+            if ($resultado === 'positivo') {
+                $resultadoTexto = 'Positivo';
+            } elseif ($resultado === 'negativo') {
+                $resultadoTexto = 'Negativo';
+            }
+
+            $html .= '<div class="resultado-bloque">';
+            $html .= '<div class="resultado-grid">';
+            $html .= '<div><strong>Resultado:</strong> ' . rp_h($resultadoTexto) . '</div>';
+            $html .= '<div><strong>Fecha:</strong> ' . rp_fmt_fecha($datos['fecha'] ?? '') . '</div>';
+            $html .= '<div><strong>Lote del antígeno:</strong> ' . rp_h($datos['lote_antigeno'] ?? '') . '</div>';
+            $html .= '<div><strong>Lote del antisuero:</strong> ' . rp_h($datos['lote_antisuero'] ?? '') . '</div>';
+            $html .= '<div><strong>Responsable:</strong> ' . rp_h($datos['responsable'] ?? '') . '</div>';
+            $html .= '<div><strong>Supervisor:</strong> ' . rp_h($datos['supervisor'] ?? '') . '</div>';
+            $html .= '</div>';
+            $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';
+            $html .= '</div>';
+            return $html;
+        }			 		 
         $archivo = $datos['archivo'] ?? null;
         $html .= '<div class="resultado-bloque">';
         $html .= '<div class="obs"><strong>Observaciones:</strong><br>' . nl2br(rp_h($fila['observaciones'])) . '</div>';
