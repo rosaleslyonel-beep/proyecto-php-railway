@@ -11,7 +11,7 @@ $id_resultado = $_POST['id_resultado'] ?? null;
 $id_muestra = $_POST['id_muestra'] ?? null;
 $id_analisis = $_POST['id_analisis'] ?? null;
 $id_protocolo = $_POST['id_protocolo'] ?? null;
-
+$observaciones = $_POST['observaciones'] ?? null;
 if (!$id_muestra || !$id_analisis || !$id_protocolo) {
     echo "Error: Faltan datos del formulario.";
     exit;
