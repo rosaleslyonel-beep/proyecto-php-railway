@@ -3,7 +3,6 @@ session_start();
 require_once "config/helpers.php";
 require_once "config/database.php";
 
-// Validación de parámetros
 if (!isset($_GET['id_muestra'], $_GET['id_analisis'])) {
     echo "<p>⚠️ Error: Faltan parámetros.</p>";
     exit();
@@ -12,7 +11,6 @@ if (!isset($_GET['id_muestra'], $_GET['id_analisis'])) {
 $id_muestra = (int) $_GET['id_muestra'];
 $id_analisis = (int) $_GET['id_analisis'];
 
-// Consulta para obtener información del análisis y su tipo de formulario
 $stmt = $conexion->prepare("
     SELECT a.nombre_estudio, a.tipo_formulario, m.tipo_muestra, m.id_protocolo
     FROM muestra_analisis ma
@@ -29,34 +27,49 @@ if (!$datos) {
 }
 
 $id_protocolo = (int)$datos['id_protocolo'];
+$tipo_formulario = $datos['tipo_formulario'] ?? 'generico';
+$nombre_estudio = $datos['nombre_estudio'];
+$tipo_muestra = $datos['tipo_muestra'];
 
-// Verificar si el resultado actual ya fue emitido en alguna emisión del protocolo
-$stmt = $conexion->prepare("
-    SELECT id_resultado
-    FROM resultados_analisis
-    WHERE id_muestra = ? AND id_analisis = ?
-");
-$stmt->execute([$id_muestra, $id_analisis]);
-$id_resultado_actual = $stmt->fetchColumn();
+include "views/header.php";
+include "views/menu.php";
+?>
+<div id="contenido">
+    <h2>Resultado de Análisis: <?= htmlspecialchars($nombre_estudio) ?></h2>
+    <p><strong>Muestra:</strong> <?= htmlspecialchars($tipo_muestra) ?> (ID <?= $id_muestra ?>)</p>
 
-$resultado_emitido = false;
-if ($id_resultado_actual) {
-    $stmt = $conexion->prepare("
-        SELECT resultados_incluidos_json
-        FROM protocolo_emisiones_resultados
-        WHERE id_protocolo = ?
-    ");
-    $stmt->execute([$id_protocolo]);
-    $emisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    <?php if (!empty($_GET['error'])): ?>
+        <div style="background:#f8d7da; border:1px solid #f5c2c7; color:#842029; padding:12px; border-radius:6px; margin:15px 0;">
+            <?= htmlspecialchars($_GET['error']) ?>
+        </div>
+    <?php endif; ?>
 
-    foreach ($emisiones as $emision) {
-        $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
-        if (is_array($ids) && in_array((int)$id_resultado_actual, array_map('intval', $ids), true)) {
-            $resultado_emitido = true;
-            break;
+    <div style="margin-top: 20px;">
+        <?php
+        $form_path = "formularios_resultado/form_resultado_" . strtolower($tipo_formulario) . ".php";
+        if (file_exists($form_path)) {
+            include $form_path;
+        } else {
+            echo "<p>⚠️ No hay un formulario configurado para el tipo <strong>$tipo_formulario</strong>.</p>";
         }
-    }
-}
+        ?>
+    </div>
+</div>
+<?php include "views/footer.php"; ?>
+				   
+							  
+	   
+									
+												   
+
+									  
+																				
+																									 
+									  
+				  
+		 
+	 
+ 
 
 $tipo_formulario = $datos['tipo_formulario'] ?? 'generico';
 $nombre_estudio = $datos['nombre_estudio'];
@@ -70,10 +83,10 @@ include "views/menu.php";
     <h2>Resultado de Análisis: <?= htmlspecialchars($nombre_estudio) ?></h2>
     <p><strong>Muestra:</strong> <?= htmlspecialchars($tipo_muestra) ?> (ID <?= $id_muestra ?>)</p>
 
-    <?php if ($resultado_emitido): ?>
-        <div style="background:#e2e3e5; border:1px solid #c6c7c8; color:#41464b; padding:12px; margin:15px 0; border-radius:6px;">
-            Este resultado ya fue emitido en un informe. Está disponible solo para consulta.
-            Para modificarlo, debe crear una corrección.
+    <?php if (!empty($_GET['error'])): ?>
+        <div style="background:#f8d7da; border:1px solid #f5c2c7; color:#842029; padding:12px; border-radius:6px; margin:15px 0;">
+            <?= htmlspecialchars($_GET['error']) ?>
+														 
         </div>
     <?php endif; ?>
 

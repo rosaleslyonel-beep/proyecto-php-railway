@@ -16,35 +16,28 @@ $id_muestra = (int) $_GET['id_muestra'];
 $id_analisis = (int) $_GET['id_analisis'];
 $usuario = $_SESSION['usuario']['id_usuario'] ?? 1;
 
-// Verificar protocolo
 $stmt = $conexion->prepare("SELECT id_protocolo FROM muestras WHERE id_muestra = ? ");
 $stmt->execute([$id_muestra]);
 $id_protocolo = $stmt->fetchColumn();
 
-// Verificar si ya existe resultado
 $stmt = $conexion->prepare("SELECT id_resultado FROM resultados_analisis WHERE id_muestra = ? AND id_analisis = ?");
 $stmt->execute([$id_muestra, $id_analisis]);
 $existe = $stmt->fetchColumn();
 
-// Bloquear si ya fue emitido
 if ($existe) {
-    $stmt = $conexion->prepare("
-        SELECT resultados_incluidos_json
-        FROM protocolo_emisiones_resultados
-        WHERE id_protocolo = ?
-    ");
+    $stmt = $conexion->prepare("SELECT resultados_incluidos_json FROM protocolo_emisiones_resultados WHERE id_protocolo = ?");
     $stmt->execute([$id_protocolo]);
     $emisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($emisiones as $emision) {
         $ids = json_decode($emision['resultados_incluidos_json'] ?? '[]', true);
         if (is_array($ids) && in_array((int)$existe, array_map('intval', $ids), true)) {
-            die("Este resultado ya fue emitido y no puede modificarse directamente. Debe generar una corrección.");
+            header("Location: resultado_analisis.php?id_protocolo=$id_protocolo&id_muestra=$id_muestra&id_analisis=$id_analisis&error=" . urlencode("Este resultado ya fue emitido y no puede modificarse directamente. Debe generar una corrección."));
+            exit();
         }
     }
 }
 
-// Serializar los resultados de la placa
 $placa = $_POST['placas'];
 $placa_json = json_encode($placa);
 
@@ -60,20 +53,7 @@ $resultado_cp = $_POST['resultado_cp'] ?? null;
 $lote_cn = $_POST['lote_cn'] ?? null;
 $resultado_cn = $_POST['resultado_cn'] ?? null;
 
-								   
-																													
-											
-							   
-
-								   
-																					 
-							  
-									 
-
-
-
 if ($existe) {
-				 
     $stmt = $conexion->prepare("UPDATE resultados_analisis SET
         datos_json = :datos,
         observaciones = :observaciones,
@@ -107,7 +87,6 @@ if ($existe) {
         ':id' => $existe
     ]);
 } else {
-			   
     $stmt = $conexion->prepare("INSERT INTO resultados_analisis (
         id_muestra, id_analisis, datos_json, observaciones,
         lote_antigeno, fecha_elaboracion, prueba_para, hora_inicio,
@@ -137,7 +116,6 @@ if ($existe) {
     ]);
 }
 
-					  
 header("Location: gestion_protocolos.php?id=$id_protocolo&tab=tab_resultados");
 exit();
 ?>
