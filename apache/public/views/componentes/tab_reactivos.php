@@ -1,5 +1,7 @@
 <div id="tab_reactivos" class="tab-content" style="display:none;">
-    <div style="height: 200px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
+    <h3>Reactivos</h3>
+
+    <div style="height: 150px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
         <table width="100%" border="1" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
             <thead style="position: sticky; top: 0; background: #f1f1f1; z-index: 1;">
                 <tr>
@@ -49,6 +51,20 @@
 </div>
 
 <script>
+let reactivoFilaSeleccionada = null;
+
+function resaltarFilaSeleccionada(tr) {
+    document.querySelectorAll('#cuerpo_reactivos tr').forEach(fila => {
+        fila.style.backgroundColor = '';
+        fila.style.fontWeight = '';
+    });
+    if (tr) {
+        tr.style.backgroundColor = '#d9f2e6';
+        tr.style.fontWeight = 'bold';
+        reactivoFilaSeleccionada = tr;
+    }
+}
+
 function cargarReactivos(){
 fetch('controllers/reactivo_guardar.php?listar=1&id_analisis='+ID_ANALISIS)
 .then(r=>r.json())
@@ -57,7 +73,7 @@ let tbody=document.getElementById('cuerpo_reactivos');
 tbody.innerHTML='';
 data.forEach(r=>{
 let tr=document.createElement('tr');
-tr.onclick=()=>seleccionarReactivo(r);
+tr.onclick=()=>seleccionarReactivo(r, tr);
 tr.style.cursor='pointer';
 tr.innerHTML=`<td>${r.orden_pipeteo}</td><td>${r.reactivo}</td><td>${r.volumen||''}</td><td>${r.unidad_medida}</td>`;
 tbody.appendChild(tr);
@@ -65,7 +81,8 @@ tbody.appendChild(tr);
 });
 }
 
-function seleccionarReactivo(r){
+function seleccionarReactivo(r, tr){
+resaltarFilaSeleccionada(tr);
 document.getElementById('id_reactivo').value=r.id_reactivo;
 document.getElementById('orden_pipeteo').value=r.orden_pipeteo;
 document.getElementById('reactivo').value=r.reactivo;
@@ -74,6 +91,7 @@ document.getElementById('unidad_medida').value=r.unidad_medida;
 }
 
 function nuevoReactivo(){
+resaltarFilaSeleccionada(null);
 document.getElementById('id_reactivo').value='';
 document.getElementById('orden_pipeteo').value='';
 document.getElementById('reactivo').value='';
