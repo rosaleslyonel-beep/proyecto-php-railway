@@ -276,6 +276,17 @@ btn.addEventListener('click', () => {
     btn.innerHTML = panelOculto ? '&#8594;' : '&#8592;'; // Flecha derecha/izquierda
     // Si deseas guardar el estado, usa localStorage aquí
 });
+
+// Si en la URL viene ?tab=algo, activar ese tab al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    aplicarBloqueoEstructura();
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab) {
+        mostrarTab(tab);
+    }
+});
+
 function mostrarTab(tabId) {
     // Oculta todos los contenidos de pestañas
     document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
