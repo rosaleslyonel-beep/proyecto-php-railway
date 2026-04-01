@@ -1,9 +1,9 @@
 <div id="tab_reactivos" class="tab-content" style="display:none;">
     <h3>Reactivos</h3>
 
-    <div style="max-height:250px;overflow-y:auto;border:1px solid #ccc;">
-        <table width="100%" border="1">
-            <thead>
+    <div style="height: 260px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
+        <table width="100%" border="1" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: #f1f1f1; z-index: 1;">
                 <tr>
                     <th>Orden</th>
                     <th>Reactivo</th>
@@ -15,28 +15,38 @@
         </table>
     </div>
 
-    <div style="margin-top:15px;">
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:10px; background:#f7f7f7; border:1px solid #ccc;">
+        <button type="button" onclick="guardarReactivo()">💾 Guardar</button>
+        <button type="button" onclick="nuevoReactivo()">➕ Nuevo</button>
+        <button type="button" onclick="eliminarReactivo()">🗑 Eliminar</button>
+    </div>
+
+    <div style="margin-top:15px; max-height: 280px; overflow-y: auto; border-top:1px solid #ddd; padding-top:12px;">
         <input type="hidden" id="id_reactivo">
 
-        <label>Orden:</label>
-        <input type="number" id="orden_pipeteo"><br>
+        <div class="form-group">
+            <label>Orden:</label>
+            <input type="number" id="orden_pipeteo">
+        </div>
 
-        <label>Reactivo:</label>
-        <textarea id="reactivo"></textarea><br>
+        <div class="form-group">
+            <label>Reactivo:</label>
+            <textarea id="reactivo" maxlength="200"></textarea>
+        </div>
 
-        <label>Volumen:</label>
-        <input type="number" step="0.01" id="volumen"><br>
+        <div class="form-group">
+            <label>Volumen:</label>
+            <input type="number" step="0.01" id="volumen">
+        </div>
 
-        <label>Unidad:</label>
-        <select id="unidad_medida">
-            <option value="µL">µL</option>
-            <option value="mL">mL</option>
-            <option value="L">L</option>
-        </select><br><br>
-
-        <button type="button" onclick="guardarReactivo()">Guardar</button>
-        <button type="button" onclick="nuevoReactivo()">Nuevo</button>
-        <button type="button" onclick="eliminarReactivo()">Eliminar</button>
+        <div class="form-group">
+            <label>Unidad:</label>
+            <select id="unidad_medida">
+                <option value="µL">µL</option>
+                <option value="mL">mL</option>
+                <option value="L">L</option>
+            </select>
+        </div>
     </div>
 </div>
 
@@ -50,6 +60,7 @@ tbody.innerHTML='';
 data.forEach(r=>{
 let tr=document.createElement('tr');
 tr.onclick=()=>seleccionarReactivo(r);
+tr.style.cursor='pointer';
 tr.innerHTML=`<td>${r.orden_pipeteo}</td><td>${r.reactivo}</td><td>${r.volumen||''}</td><td>${r.unidad_medida}</td>`;
 tbody.appendChild(tr);
 });
@@ -99,11 +110,10 @@ unidad_medida:document.getElementById('unidad_medida').value
 });
 }
 
-
 function eliminarReactivo(){
 let id=document.getElementById('id_reactivo').value;
 if(!id)return;
-if(!confirm('Eliminar?'))return;
+if(!confirm('¿Eliminar?'))return;
 
 fetch('controllers/reactivo_guardar.php',{
 method:'POST',
@@ -112,14 +122,14 @@ body:new URLSearchParams({eliminar:1,id_reactivo:id})
 .then(r => r.text())
 .then(txt => {
     if ((txt || '').trim() !== 'ok') {
-        alert(txt || 'No se pudo guardar el reactivo.');
+        alert(txt || 'No se pudo eliminar el reactivo.');
         return;
     }
     cargarReactivos();
     nuevoReactivo();
 })
 .catch(err => {
-    alert('Error al guardar reactivo.');
+    alert('Error al eliminar reactivo.');
     console.error(err);
 });
 }
