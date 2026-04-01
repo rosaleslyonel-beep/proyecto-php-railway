@@ -86,6 +86,7 @@ unidad_medida:document.getElementById('unidad_medida').value
 }).then(()=>{cargarReactivos();nuevoReactivo();});
 }
 
+
 function eliminarReactivo(){
 let id=document.getElementById('id_reactivo').value;
 if(!id)return;
