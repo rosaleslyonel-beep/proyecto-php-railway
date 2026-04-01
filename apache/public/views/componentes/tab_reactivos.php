@@ -1,5 +1,5 @@
 <div id="tab_reactivos" class="tab-content" style="display:none;">
-    <div style="height: 260px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
+    <div style="height: 200px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
         <table width="100%" border="1" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
             <thead style="position: sticky; top: 0; background: #f1f1f1; z-index: 1;">
                 <tr>
