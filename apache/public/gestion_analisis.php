@@ -237,6 +237,28 @@ include "views/menu.php";
         color: #004d40;
     }
 
+    .form-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr 140px 1fr;
+    gap: 10px 12px;
+    align-items: center;
+}
+
+.form-grid label {
+    font-weight: bold;
+    text-align: right;
+}
+
+.form-grid input,
+.form-grid select {
+    width: 100%;
+}
+
+.form-grid textarea {
+    grid-column: 2 / span 3;
+    width: 100%;
+}
+
 </style>
 
 <script>

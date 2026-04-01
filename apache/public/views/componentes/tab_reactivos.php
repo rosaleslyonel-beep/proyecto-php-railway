@@ -1,6 +1,5 @@
 <div id="tab_reactivos" class="tab-content" style="display:none;">
-    <h3>Reactivos</h3>
-
+    
     <div style="height: 150px; overflow-y: auto; overflow-x: auto; border: 1px solid #ccc; background:#fff;">
         <table width="100%" border="1" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
             <thead style="position: sticky; top: 0; background: #f1f1f1; z-index: 1;">
@@ -23,30 +22,28 @@
 
     <div style="margin-top:15px; max-height: 280px; overflow-y: auto; border-top:1px solid #ddd; padding-top:12px;">
         <input type="hidden" id="id_reactivo">
+        
+        <div class="form-grid">
 
-        <div class="form-group">
             <label>Orden:</label>
             <input type="number" id="orden_pipeteo">
-        </div>
 
-        <div class="form-group">
-            <label>Reactivo:</label>
-            <textarea id="reactivo" maxlength="200"></textarea>
-        </div>
-
-        <div class="form-group">
             <label>Volumen:</label>
             <input type="number" step="0.01" id="volumen">
-        </div>
 
-        <div class="form-group">
             <label>Unidad:</label>
             <select id="unidad_medida">
                 <option value="µL">µL</option>
                 <option value="mL">mL</option>
                 <option value="L">L</option>
             </select>
+
+            <label>Reactivo:</label>
+            <textarea id="reactivo" maxlength="200"></textarea>
+
         </div>
+
+       
     </div>
 </div>
 
