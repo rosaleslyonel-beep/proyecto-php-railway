@@ -28,7 +28,7 @@
             <label>Orden:</label>
             <input type="number" id="orden_pipeteo">
 <label>Reactivo:</label>
-            <textarea id="reactivo" maxlength="200"></textarea>
+            <input id="reactivo" maxlength="200"></textarea>
 
             <label>Volumen:</label>
             <input type="number" step="0.01" id="volumen">
