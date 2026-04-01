@@ -279,7 +279,7 @@ btn.addEventListener('click', () => {
 
 // Si en la URL viene ?tab=algo, activar ese tab al cargar
 document.addEventListener('DOMContentLoaded', function() {
-    aplicarBloqueoEstructura();
+    //aplicarBloqueoEstructura();
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     if (tab) {
