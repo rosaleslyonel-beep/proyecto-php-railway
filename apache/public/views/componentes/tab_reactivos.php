@@ -34,9 +34,9 @@
             <option value="L">L</option>
         </select><br><br>
 
-        <button onclick="guardarReactivo()">Guardar</button>
-        <button onclick="nuevoReactivo()">Nuevo</button>
-        <button onclick="eliminarReactivo()">Eliminar</button>
+        <button type="button" onclick="guardarReactivo()">Guardar</button>
+        <button type="button" onclick="nuevoReactivo()">Nuevo</button>
+        <button type="button" onclick="eliminarReactivo()">Eliminar</button>
     </div>
 </div>
 
@@ -83,7 +83,20 @@ reactivo:document.getElementById('reactivo').value,
 volumen:document.getElementById('volumen').value,
 unidad_medida:document.getElementById('unidad_medida').value
 })
-}).then(()=>{cargarReactivos();nuevoReactivo();});
+})
+.then(r => r.text())
+.then(txt => {
+    if ((txt || '').trim() !== 'ok') {
+        alert(txt || 'No se pudo guardar el reactivo.');
+        return;
+    }
+    cargarReactivos();
+    nuevoReactivo();
+})
+.catch(err => {
+    alert('Error al guardar reactivo.');
+    console.error(err);
+});
 }
 
 
@@ -95,6 +108,19 @@ if(!confirm('Eliminar?'))return;
 fetch('controllers/reactivo_guardar.php',{
 method:'POST',
 body:new URLSearchParams({eliminar:1,id_reactivo:id})
-}).then(()=>{cargarReactivos();nuevoReactivo();});
+})
+.then(r => r.text())
+.then(txt => {
+    if ((txt || '').trim() !== 'ok') {
+        alert(txt || 'No se pudo guardar el reactivo.');
+        return;
+    }
+    cargarReactivos();
+    nuevoReactivo();
+})
+.catch(err => {
+    alert('Error al guardar reactivo.');
+    console.error(err);
+});
 }
 </script>
